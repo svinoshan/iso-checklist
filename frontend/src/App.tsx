@@ -208,6 +208,7 @@ export default function App() {
       <HeaderBar
         version={AUDIT_CONFIG.appVersion}
         companyName={report.details.companyName}
+        schemes={report.details.schemes}
         summary={summary}
         isExporting={isExporting}
         lastSavedAt={lastSavedAt}
