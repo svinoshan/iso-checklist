@@ -1,4 +1,10 @@
-import { Download, FileSpreadsheet, FolderOpen, Plus } from 'lucide-react';
+import {
+  Download,
+  FileSpreadsheet,
+  FolderOpen,
+  Loader2,
+  Plus,
+} from 'lucide-react';
 import type { FindingsSummary, IsoScheme } from '../types/audit';
 
 interface HeaderBarProps {
@@ -152,9 +158,14 @@ export function HeaderBar({
             type="button"
             onClick={onExportExcel}
             disabled={isExporting}
-            className="inline-flex items-center gap-1.5 rounded-md bg-[#1E3A5F] px-3 py-1.5 text-xs font-semibold text-white shadow-xs transition hover:bg-[#162d4a] disabled:cursor-not-allowed disabled:opacity-60"
+            aria-busy={isExporting}
+            className="inline-flex items-center gap-1.5 rounded-md bg-[#1E3A5F] px-3 py-1.5 text-xs font-semibold text-white shadow-xs transition hover:bg-[#162d4a] disabled:opacity-60"
           >
-            <Download className="h-3.5 w-3.5" />
+            {isExporting ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Download className="h-3.5 w-3.5" />
+            )}
             <span>{isExporting ? 'Generating...' : 'Export Excel'}</span>
           </button>
         </div>
