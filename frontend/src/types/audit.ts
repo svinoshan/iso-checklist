@@ -64,6 +64,7 @@ export interface AuditStaticContent {
 }
 
 export interface AuditConfig {
+  appVersion: string;
   templateRevision: string;
   auditTypes: AuditType[];
   schemes: SchemeOption[];

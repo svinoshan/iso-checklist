@@ -1,10 +1,4 @@
-import {
-  Building2,
-  CheckCircle2,
-  ClipboardCheck,
-  FileText,
-  ListChecks,
-} from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import { getClauseEvaluation, getVisibleClausesForSheet } from '../domain/auditRules';
 import type {
   AuditReport,
@@ -19,13 +13,11 @@ interface StepNavigationProps {
   sheets: readonly ClauseSheetDefinition[];
 }
 
-interface StepItem {
+interface SheetTabItem {
   id: WizardStepId;
   label: string;
-  subtitle?: string;
   badge?: string;
-  complete?: boolean;
-  icon: 'details' | 'intro' | 'clause' | 'conclusion';
+  complete: boolean;
 }
 
 export function StepNavigation({
@@ -55,22 +47,18 @@ export function StepNavigation({
         report.conclusion.followUpComment.trim()),
   );
 
-  const steps: StepItem[] = [
+  const tabs: SheetTabItem[] = [
     {
       id: 'audit-details',
-      label: '1. Audit Details',
-      subtitle: 'Company, schemes & team',
+      label: 'Audit Details',
       complete: detailsComplete,
-      icon: 'details',
     },
     {
       id: 'audit-introduction',
-      label: '2. Introduction & CU',
-      subtitle: 'Scope & accreditation',
+      label: 'Introduction & CU',
       complete: introComplete,
-      icon: 'intro',
     },
-    ...sheets.map((sheet, index): StepItem => {
+    ...sheets.map((sheet): SheetTabItem => {
       const visible = getVisibleClausesForSheet(
         sheet,
         report.details.schemes,
@@ -82,90 +70,58 @@ export function StepNavigation({
 
       return {
         id: sheet.id,
-        label: `${index + 3}. ${sheet.navLabel}`,
-        subtitle: `${visible.length} applicable clause${visible.length === 1 ? '' : 's'}`,
+        label: sheet.navLabel,
         badge: `${evaluated}/${visible.length}`,
         complete: visible.length > 0 && evaluated === visible.length,
-        icon: 'clause',
       };
     }),
     {
       id: 'findings-conclusion',
-      label: '7. Findings & Conclusion',
-      subtitle: 'Summary & recommendation',
+      label: 'Findings & Conclusion',
       complete: conclusionComplete,
-      icon: 'conclusion',
     },
   ];
 
-  const renderIcon = (icon: StepItem['icon'], isActive: boolean) => {
-    const className = `h-4 w-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`;
-    switch (icon) {
-      case 'details':
-        return <Building2 className={className} />;
-      case 'intro':
-        return <FileText className={className} />;
-      case 'clause':
-        return <ListChecks className={className} />;
-      case 'conclusion':
-        return <ClipboardCheck className={className} />;
-    }
-  };
-
   return (
-    <nav aria-label="Audit report sections" className="w-full lg:w-68 lg:shrink-0">
-      <div className="flex gap-2 overflow-x-auto pb-2 lg:sticky lg:top-20 lg:flex-col lg:overflow-visible lg:pb-0">
-        {steps.map((step) => {
-          const isActive = step.id === activeStep;
+    <nav
+      aria-label="Workbook sheets"
+      className="bg-slate-100/90 shadow-[inset_0_-1px_0_0_#e2e8f0]"
+    >
+      <div className="mx-auto flex max-w-[1600px] items-end gap-1 overflow-x-auto overflow-y-hidden px-4 pt-2 sm:px-5">
+        {tabs.map((tab) => {
+          const isActive = tab.id === activeStep;
           return (
             <button
-              key={step.id}
+              key={tab.id}
               type="button"
-              onClick={() => onSelectStep(step.id)}
-              className={`flex shrink-0 items-center justify-between gap-2 rounded-xl border px-3.5 py-2.5 text-left transition lg:w-full ${
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => onSelectStep(tab.id)}
+              className={`relative flex shrink-0 items-center gap-1.5 rounded-t-lg border px-3.5 py-2 text-xs font-medium whitespace-nowrap transition sm:text-[0.8125rem] ${
                 isActive
-                  ? 'border-[#1E3A5F] bg-[#1E3A5F] text-white shadow-sm'
-                  : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+                  ? 'z-10 border-slate-200 border-b-white bg-white font-semibold text-[#1E3A5F] shadow-[inset_0_2px_0_0_#1E3A5F]'
+                  : 'border-transparent border-b-slate-200 bg-slate-200/60 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
               }`}
             >
-              <div className="flex items-center gap-2.5">
-                {renderIcon(step.icon, isActive)}
-                <div>
-                  <div className="text-sm font-medium leading-tight">{step.label}</div>
-                  {step.subtitle && (
-                    <div
-                      className={`mt-0.5 text-xs ${
-                        isActive ? 'text-slate-200' : 'text-slate-500'
-                      }`}
-                    >
-                      {step.subtitle}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1.5">
-                {step.badge && (
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                      isActive
-                        ? 'bg-white/20 text-white'
-                        : step.complete
-                          ? 'bg-emerald-50 text-emerald-700'
-                          : 'bg-slate-100 text-slate-600'
-                    }`}
-                  >
-                    {step.badge}
-                  </span>
-                )}
-                {step.complete && (
-                  <CheckCircle2
-                    className={`h-4 w-4 shrink-0 ${
-                      isActive ? 'text-emerald-300' : 'text-emerald-600'
-                    }`}
-                  />
-                )}
-              </div>
+              <span>{tab.label}</span>
+              {tab.badge && (
+                <span
+                  className={`rounded-full px-1.5 py-0.5 text-[0.625rem] font-semibold ${
+                    isActive
+                      ? tab.complete
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'bg-[#1E3A5F]/10 text-[#1E3A5F]'
+                      : tab.complete
+                        ? 'bg-emerald-100/80 text-emerald-800'
+                        : 'bg-white/70 text-slate-600'
+                  }`}
+                >
+                  {tab.badge}
+                </span>
+              )}
+              {tab.complete && (
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
+              )}
             </button>
           );
         })}
