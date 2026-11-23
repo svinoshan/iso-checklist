@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { AccessibilityWidget } from './components/AccessibilityWidget';
 import { AuditDetailsStep } from './components/AuditDetailsStep';
@@ -46,6 +46,7 @@ export default function App() {
   const [drafts, setDrafts] = useState<AuditDraftSummary[]>([]);
   const [isDraftsOpen, setIsDraftsOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const isExportingRef = useRef(false);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
   const fontScaleControls = useFontScale();
@@ -183,6 +184,10 @@ export default function App() {
   };
 
   const handleExportExcel = async () => {
+    if (isExportingRef.current) {
+      return;
+    }
+    isExportingRef.current = true;
     setExportError(null);
     setIsExporting(true);
     try {
@@ -194,6 +199,7 @@ export default function App() {
           : 'Failed to generate Excel workbook.',
       );
     } finally {
+      isExportingRef.current = false;
       setIsExporting(false);
     }
   };
