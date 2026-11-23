@@ -1,0 +1,631 @@
+import ExcelJS from 'exceljs';
+import {
+  calculateFindingsSummary,
+  extractFindingsList,
+  formatDisplayDate,
+  getClauseEvaluation,
+  getVisibleClausesForSheet,
+  resolveOutcomeText,
+} from '../domain/auditRules';
+import type {
+  AuditConfig,
+  AuditReport,
+  ClauseSheetDefinition,
+  FindingRecord,
+  FindingsSummary,
+} from '../types/audit';
+
+const HEADER_FILL: ExcelJS.Fill = {
+  type: 'pattern',
+  pattern: 'solid',
+  fgColor: { argb: 'FF1E3A5F' },
+};
+
+const SUBHEADER_FILL: ExcelJS.Fill = {
+  type: 'pattern',
+  pattern: 'solid',
+  fgColor: { argb: 'FFEBF1F8' },
+};
+
+const ALT_ROW_FILL: ExcelJS.Fill = {
+  type: 'pattern',
+  pattern: 'solid',
+  fgColor: { argb: 'FFF8FAFC' },
+};
+
+const THIN_BORDER: Partial<ExcelJS.Borders> = {
+  top: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+  left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+  bottom: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+  right: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+};
+
+const BASE_FONT: Partial<ExcelJS.Font> = {
+  name: 'Calibri',
+  size: 10,
+  color: { argb: 'FF0F172A' },
+};
+
+const HEADER_FONT: Partial<ExcelJS.Font> = {
+  name: 'Calibri',
+  size: 11,
+  bold: true,
+  color: { argb: 'FFFFFFFF' },
+};
+
+const SECTION_FONT: Partial<ExcelJS.Font> = {
+  name: 'Calibri',
+  size: 11,
+  bold: true,
+  color: { argb: 'FF1E3A5F' },
+};
+
+function estimateRowHeight(
+  texts: readonly { text: string; widthChars: number }[],
+  lineHeight = 15,
+  minHeight = 22,
+): number {
+  let maxLines = 1;
+  for (const item of texts) {
+    if (!item.text) {
+      continue;
+    }
+    const paragraphs = item.text.split('\n');
+    let lines = 0;
+    const effectiveWidth = Math.max(item.widthChars - 2, 10);
+    for (const para of paragraphs) {
+      lines += Math.max(1, Math.ceil(para.length / effectiveWidth));
+    }
+    if (lines > maxLines) {
+      maxLines = lines;
+    }
+  }
+  return Math.max(minHeight, maxLines * lineHeight + 10);
+}
+
+function configurePrintLayout(ws: ExcelJS.Worksheet, landscape = false): void {
+  ws.pageSetup = {
+    paperSize: 9, // A4
+    orientation: landscape ? 'landscape' : 'portrait',
+    fitToPage: true,
+    fitToWidth: 1,
+    fitToHeight: 0,
+  };
+}
+
+function buildAuditDetailsSheet(
+  workbook: ExcelJS.Workbook,
+  report: AuditReport,
+  config: AuditConfig,
+): void {
+  const ws = workbook.addWorksheet('Audit Details');
+  configurePrintLayout(ws, false);
+
+  ws.columns = [
+    { key: 'label', width: 32 },
+    { key: 'value', width: 58 },
+  ];
+
+  const schemeLabels = report.details.schemes.map((code) => {
+    const match = config.schemes.find((s) => s.code === code);
+    return match ? `${match.standardCode} (${match.shortLabel}) - ${match.fullName}` : code;
+  });
+
+  const dateRange =
+    report.details.auditStartDate && report.details.auditEndDate
+      ? `${formatDisplayDate(report.details.auditStartDate)} to ${formatDisplayDate(report.details.auditEndDate)}`
+      : formatDisplayDate(report.details.auditStartDate || report.details.auditEndDate);
+
+  const rows: readonly [string, string][] = [
+    ['Type of Audit', report.details.auditType],
+    ['Company Name', report.details.companyName],
+    ['Scheme/s', schemeLabels.join('\n')],
+    ['Audit Start Date / End Date', dateRange],
+    ['CU Project Number', report.details.cuProjectNumber],
+    ['Team Leader', report.details.teamLeader],
+    ['Team Members', report.details.teamMembers],
+    ['Report Completed Date', formatDisplayDate(report.details.reportCompletedDate)],
+  ];
+
+  rows.forEach(([label, value], index) => {
+    const row = ws.getRow(index + 1);
+    const labelCell = row.getCell(1);
+    const valueCell = row.getCell(2);
+
+    labelCell.value = label;
+    labelCell.font = { ...BASE_FONT, bold: true, color: { argb: 'FF1E3A5F' } };
+    labelCell.fill = SUBHEADER_FILL;
+    labelCell.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+    labelCell.border = THIN_BORDER;
+
+    valueCell.value = value;
+    valueCell.font = BASE_FONT;
+    valueCell.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+    valueCell.border = THIN_BORDER;
+
+    row.height = estimateRowHeight([
+      { text: label, widthChars: 32 },
+      { text: value, widthChars: 58 },
+    ], 16, 24);
+  });
+}
+
+function buildIntroductionSheet(
+  workbook: ExcelJS.Workbook,
+  report: AuditReport,
+  config: AuditConfig,
+): void {
+  const ws = workbook.addWorksheet('Audit Introduction and CU');
+  configurePrintLayout(ws, false);
+
+  ws.columns = [{ key: 'content', width: 120 }];
+
+  const entityMatch = config.accreditedEntities.find(
+    (item) => item.code === report.introduction.accreditedLegalEntity,
+  );
+  const entityDisplay = entityMatch ? entityMatch.fullName : '';
+
+  const blocks: readonly { heading: string; body: string }[] = [
+    {
+      heading: config.staticContent.reportTitle,
+      body: config.staticContent.introductionText,
+    },
+    {
+      heading: config.staticContent.organizationHeading,
+      body: '',
+    },
+    {
+      heading: 'Scope of Certification',
+      body: report.introduction.scopeOfCertification.trim(),
+    },
+    {
+      heading: 'Accredited Legal Entity',
+      body: entityDisplay,
+    },
+    {
+      heading: 'Confidentiality Statement',
+      body: config.staticContent.confidentialityStatement,
+    },
+    {
+      heading: 'Disclaimer',
+      body: config.staticContent.disclaimerText,
+    },
+  ];
+
+  let currentRow = 1;
+  for (const block of blocks) {
+    const headingRow = ws.getRow(currentRow);
+    const headingCell = headingRow.getCell(1);
+    headingCell.value = block.heading;
+    headingCell.font = SECTION_FONT;
+    headingCell.fill = SUBHEADER_FILL;
+    headingCell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+    headingCell.border = THIN_BORDER;
+    headingRow.height = 24;
+    currentRow += 1;
+
+    if (block.body) {
+      const bodyRow = ws.getRow(currentRow);
+      const bodyCell = bodyRow.getCell(1);
+      bodyCell.value = block.body;
+      bodyCell.font = BASE_FONT;
+      bodyCell.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+      bodyCell.border = THIN_BORDER;
+      bodyRow.height = estimateRowHeight([{ text: block.body, widthChars: 118 }], 15, 24);
+      currentRow += 1;
+    }
+
+    currentRow += 1; // clean spacer row between sections
+  }
+}
+
+function buildFindingsAndConclusionSheet(
+  workbook: ExcelJS.Workbook,
+  report: AuditReport,
+  config: AuditConfig,
+  summary: FindingsSummary,
+  findingsCount: number,
+): void {
+  const ws = workbook.addWorksheet('Audit findings & Conclusion');
+  configurePrintLayout(ws, false);
+
+  ws.columns = [
+    { key: 'colA', width: 34 },
+    { key: 'colB', width: 92 },
+  ];
+
+  const findingsEndRow = Math.max(findingsCount + 1, 2);
+
+  const metricRows: readonly {
+    label: string;
+    formula: string;
+    result: number;
+  }[] = [
+    {
+      label: 'Number of NCs:',
+      formula: 'B2+B3',
+      result: summary.totalNcs,
+    },
+    {
+      label: 'Number of Minor NC:',
+      formula: `COUNTIF('List of Findings'!C2:C${findingsEndRow},"Minor NC")`,
+      result: summary.minorNcs,
+    },
+    {
+      label: 'Number of Major NC:',
+      formula: `COUNTIF('List of Findings'!C2:C${findingsEndRow},"Major NC")`,
+      result: summary.majorNcs,
+    },
+    {
+      label: 'Observations:',
+      formula: `COUNTIF('List of Findings'!C2:C${findingsEndRow},"Observation")`,
+      result: summary.observations,
+    },
+    {
+      label: 'Open NC:',
+      formula: `COUNTIFS('List of Findings'!C2:C${findingsEndRow},"Minor NC",'List of Findings'!D2:D${findingsEndRow},"Open")+COUNTIFS('List of Findings'!C2:C${findingsEndRow},"Major NC",'List of Findings'!D2:D${findingsEndRow},"Open")`,
+      result: summary.openNcs,
+    },
+  ];
+
+  metricRows.forEach((metric, index) => {
+    const row = ws.getRow(index + 1);
+    const labelCell = row.getCell(1);
+    const valueCell = row.getCell(2);
+
+    labelCell.value = metric.label;
+    labelCell.font = { ...BASE_FONT, bold: true, color: { argb: 'FF1E3A5F' } };
+    labelCell.fill = SUBHEADER_FILL;
+    labelCell.alignment = { vertical: 'middle', horizontal: 'left' };
+    labelCell.border = THIN_BORDER;
+
+    valueCell.value = {
+      formula: metric.formula,
+      result: metric.result,
+    };
+    valueCell.font = { ...BASE_FONT, bold: true };
+    valueCell.alignment = { vertical: 'middle', horizontal: 'left' };
+    valueCell.numFmt = '0';
+    valueCell.border = THIN_BORDER;
+
+    row.height = 22;
+  });
+
+  // Audit Conclusion section (starts at Row 7)
+  let rowIndex = 7;
+
+  ws.mergeCells(rowIndex, 1, rowIndex, 2);
+  const conclusionHeader = ws.getRow(rowIndex);
+  conclusionHeader.getCell(1).value = 'Audit Conclusion';
+  conclusionHeader.getCell(1).font = HEADER_FONT;
+  conclusionHeader.getCell(1).fill = HEADER_FILL;
+  conclusionHeader.getCell(1).alignment = { vertical: 'middle', horizontal: 'left' };
+  conclusionHeader.getCell(1).border = THIN_BORDER;
+  conclusionHeader.getCell(2).border = THIN_BORDER;
+  conclusionHeader.height = 24;
+  rowIndex += 1;
+
+  const conclusionLines = config.conclusionItems.map((item) => {
+    const checked = report.conclusion.selectedConclusions.includes(item.id);
+    const mark = checked ? '☑' : '☐';
+    if (item.requiresDate) {
+      const dateStr = report.conclusion.correctiveActionDueDate
+        ? formatDisplayDate(report.conclusion.correctiveActionDueDate)
+        : '____________';
+      return `${mark} ${item.text} ${dateStr}.`;
+    }
+    return `${mark} ${item.text}`;
+  });
+  const conclusionBody = `${config.staticContent.auditConclusionLead}\n\n${conclusionLines.join('\n')}`;
+
+  ws.mergeCells(rowIndex, 1, rowIndex, 2);
+  const conclusionRow = ws.getRow(rowIndex);
+  conclusionRow.getCell(1).value = conclusionBody;
+  conclusionRow.getCell(1).font = BASE_FONT;
+  conclusionRow.getCell(1).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+  conclusionRow.getCell(1).border = THIN_BORDER;
+  conclusionRow.getCell(2).border = THIN_BORDER;
+  conclusionRow.height = estimateRowHeight([{ text: conclusionBody, widthChars: 122 }], 15, 180);
+  rowIndex += 2;
+
+  // Certification Recommendation
+  ws.mergeCells(rowIndex, 1, rowIndex, 2);
+  const recHeader = ws.getRow(rowIndex);
+  recHeader.getCell(1).value = 'Certification Recommendation';
+  recHeader.getCell(1).font = HEADER_FONT;
+  recHeader.getCell(1).fill = HEADER_FILL;
+  recHeader.getCell(1).alignment = { vertical: 'middle', horizontal: 'left' };
+  recHeader.getCell(1).border = THIN_BORDER;
+  recHeader.getCell(2).border = THIN_BORDER;
+  recHeader.height = 24;
+  rowIndex += 1;
+
+  const recommendationBody = config.recommendations
+    .map((option) => {
+      const mark =
+        report.conclusion.certificationRecommendation === option.id ? '☑' : '☐';
+      return `${mark} ${option.label}`;
+    })
+    .join('\n');
+
+  ws.mergeCells(rowIndex, 1, rowIndex, 2);
+  const recRow = ws.getRow(rowIndex);
+  recRow.getCell(1).value = recommendationBody;
+  recRow.getCell(1).font = BASE_FONT;
+  recRow.getCell(1).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+  recRow.getCell(1).border = THIN_BORDER;
+  recRow.getCell(2).border = THIN_BORDER;
+  recRow.height = estimateRowHeight([{ text: recommendationBody, widthChars: 122 }], 16, 90);
+  rowIndex += 2;
+
+  // Auditor Declaration & Follow-up Requirements
+  ws.mergeCells(rowIndex, 1, rowIndex, 2);
+  const declHeader = ws.getRow(rowIndex);
+  declHeader.getCell(1).value = 'Auditor Declaration & Follow-up Requirements';
+  declHeader.getCell(1).font = HEADER_FONT;
+  declHeader.getCell(1).fill = HEADER_FILL;
+  declHeader.getCell(1).alignment = { vertical: 'middle', horizontal: 'left' };
+  declHeader.getCell(1).border = THIN_BORDER;
+  declHeader.getCell(2).border = THIN_BORDER;
+  declHeader.height = 24;
+  rowIndex += 1;
+
+  const declMark = report.conclusion.auditorDeclarationAccepted ? '☑' : '☐';
+  const followUpLine = `Follow-up / Verification Audit Required: ${report.conclusion.followUpRequired || 'Not Specified'}`;
+  const followUpCommentLine =
+    report.conclusion.followUpRequired === 'Yes' &&
+    report.conclusion.followUpComment.trim()
+      ? `\nFollow-up Comment: ${report.conclusion.followUpComment.trim()}`
+      : '';
+
+  const declBody = `${declMark} ${config.staticContent.auditorDeclarationText}\n\nFollow-up Requirements\n${followUpLine}${followUpCommentLine}`;
+
+  ws.mergeCells(rowIndex, 1, rowIndex, 2);
+  const declRow = ws.getRow(rowIndex);
+  declRow.getCell(1).value = declBody;
+  declRow.getCell(1).font = BASE_FONT;
+  declRow.getCell(1).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+  declRow.getCell(1).border = THIN_BORDER;
+  declRow.getCell(2).border = THIN_BORDER;
+  declRow.height = estimateRowHeight([{ text: declBody, widthChars: 122 }], 16, 80);
+  rowIndex += 2;
+
+  // Next Audit Date
+  const nextDateRow = ws.getRow(rowIndex);
+  nextDateRow.getCell(1).value = 'Next Audit Date:';
+  nextDateRow.getCell(1).font = { ...BASE_FONT, bold: true, color: { argb: 'FF1E3A5F' } };
+  nextDateRow.getCell(1).fill = SUBHEADER_FILL;
+  nextDateRow.getCell(1).alignment = { vertical: 'middle', horizontal: 'left' };
+  nextDateRow.getCell(1).border = THIN_BORDER;
+
+  nextDateRow.getCell(2).value = formatDisplayDate(report.conclusion.nextAuditDate);
+  nextDateRow.getCell(2).font = BASE_FONT;
+  nextDateRow.getCell(2).alignment = { vertical: 'middle', horizontal: 'left' };
+  nextDateRow.getCell(2).border = THIN_BORDER;
+  nextDateRow.height = 24;
+}
+
+function buildClauseSheet(
+  workbook: ExcelJS.Workbook,
+  sheet: ClauseSheetDefinition,
+  report: AuditReport,
+): void {
+  const ws = workbook.addWorksheet(sheet.sheetName);
+  configurePrintLayout(ws, true);
+
+  ws.columns = [
+    { key: 'clause', width: 32 },
+    { key: 'description', width: 46 },
+    { key: 'outcome', width: 62 },
+    { key: 'remarks', width: 36 },
+  ];
+
+  const headerRow = ws.getRow(1);
+  const headers = ['Clause', 'Clause Description', 'Audit Outcome', 'Auditor Remarks'];
+  headers.forEach((title, idx) => {
+    const cell = headerRow.getCell(idx + 1);
+    cell.value = title;
+    cell.font = HEADER_FONT;
+    cell.fill = HEADER_FILL;
+    cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+    cell.border = THIN_BORDER;
+  });
+  headerRow.height = 26;
+  ws.views = [{ state: 'frozen', ySplit: 1 }];
+
+  const visibleClauses = getVisibleClausesForSheet(
+    sheet,
+    report.details.schemes,
+    report.evaluations,
+  );
+
+  visibleClauses.forEach((clause, index) => {
+    const evaluation = getClauseEvaluation(report.evaluations, clause.id);
+    const outcomeText = resolveOutcomeText(clause, evaluation.status);
+    const remarksText = evaluation.remarks.trim();
+
+    const row = ws.getRow(index + 2);
+    const values = [clause.title, clause.description, outcomeText, remarksText];
+    const isAlt = index % 2 === 1;
+
+    values.forEach((val, colIdx) => {
+      const cell = row.getCell(colIdx + 1);
+      cell.value = val;
+      cell.font = colIdx === 0 ? { ...BASE_FONT, bold: true } : BASE_FONT;
+      cell.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+      cell.border = THIN_BORDER;
+      if (isAlt) {
+        cell.fill = ALT_ROW_FILL;
+      }
+    });
+
+    row.height = estimateRowHeight(
+      [
+        { text: clause.title, widthChars: 32 },
+        { text: clause.description, widthChars: 46 },
+        { text: outcomeText, widthChars: 62 },
+        { text: remarksText, widthChars: 36 },
+      ],
+      15,
+      30,
+    );
+  });
+}
+
+function buildListOfFindingsSheet(
+  workbook: ExcelJS.Workbook,
+  findings: readonly FindingRecord[],
+): void {
+  const ws = workbook.addWorksheet('List of Findings');
+  configurePrintLayout(ws, true);
+
+  ws.columns = [
+    { key: 'num', width: 12 },
+    { key: 'clause', width: 38 },
+    { key: 'type', width: 16 },
+    { key: 'status', width: 14 },
+    { key: 'remarks', width: 64 },
+  ];
+
+  const headerRow = ws.getRow(1);
+  const headers = [
+    'Finding #',
+    'Clause',
+    'Finding Type',
+    'NC Status',
+    'Auditor Remarks / Evidence',
+  ];
+  headers.forEach((title, idx) => {
+    const cell = headerRow.getCell(idx + 1);
+    cell.value = title;
+    cell.font = HEADER_FONT;
+    cell.fill = HEADER_FILL;
+    cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+    cell.border = THIN_BORDER;
+  });
+  headerRow.height = 26;
+  ws.views = [{ state: 'frozen', ySplit: 1 }];
+
+  if (findings.length === 0) {
+    ws.mergeCells(2, 1, 2, 5);
+    const emptyRow = ws.getRow(2);
+    const cell = emptyRow.getCell(1);
+    cell.value = 'No nonconformities or observations were recorded during this audit.';
+    cell.font = { ...BASE_FONT, italic: true, color: { argb: 'FF475569' } };
+    cell.alignment = { vertical: 'middle', horizontal: 'left' };
+    for (let col = 1; col <= 5; col += 1) {
+      emptyRow.getCell(col).border = THIN_BORDER;
+    }
+    emptyRow.height = 24;
+    return;
+  }
+
+  findings.forEach((finding, index) => {
+    const row = ws.getRow(index + 2);
+    const values: readonly (string | number)[] = [
+      finding.findingNumber,
+      finding.clauseTitle,
+      finding.findingType,
+      finding.ncStatus,
+      finding.remarks,
+    ];
+    const isAlt = index % 2 === 1;
+
+    values.forEach((val, colIdx) => {
+      const cell = row.getCell(colIdx + 1);
+      cell.value = val;
+      cell.font =
+        colIdx === 2
+          ? {
+              ...BASE_FONT,
+              bold: true,
+              color: {
+                argb:
+                  finding.findingType === 'Major NC'
+                    ? 'FFB91C1C'
+                    : finding.findingType === 'Minor NC'
+                      ? 'FFB45309'
+                      : 'FF1D4ED8',
+              },
+            }
+          : BASE_FONT;
+      cell.alignment = {
+        vertical: 'top',
+        horizontal: colIdx === 0 ? 'center' : 'left',
+        wrapText: true,
+      };
+      cell.border = THIN_BORDER;
+      if (isAlt) {
+        cell.fill = ALT_ROW_FILL;
+      }
+    });
+
+    row.height = estimateRowHeight(
+      [
+        { text: finding.clauseTitle, widthChars: 38 },
+        { text: finding.remarks, widthChars: 64 },
+      ],
+      15,
+      26,
+    );
+  });
+}
+
+export async function exportAuditReportToExcel(
+  report: AuditReport,
+  config: AuditConfig,
+  sheets: readonly ClauseSheetDefinition[],
+): Promise<void> {
+  const workbook = new ExcelJS.Workbook();
+  workbook.creator = report.details.teamLeader || 'Control Union Auditor';
+  workbook.created = new Date();
+  workbook.modified = new Date();
+
+  const summary = calculateFindingsSummary(
+    sheets,
+    report.details.schemes,
+    report.evaluations,
+  );
+  const findings = extractFindingsList(
+    sheets,
+    report.details.schemes,
+    report.evaluations,
+  );
+
+  // Preserve the exact 7-sheet order from Audit Report Format-CU SLAB - Rev;01 1.xlsx
+  // plus the 8th auto-generated List of Findings sheet.
+  buildAuditDetailsSheet(workbook, report, config);
+  buildIntroductionSheet(workbook, report, config);
+  buildFindingsAndConclusionSheet(workbook, report, config, summary, findings.length);
+
+  for (const sheet of sheets) {
+    buildClauseSheet(workbook, sheet, report);
+  }
+
+  buildListOfFindingsSheet(workbook, findings);
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+
+  const companySlug = (report.details.companyName || 'Audit_Report')
+    .trim()
+    .replace(/[^a-zA-Z0-9-_]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+  const projectSlug = report.details.cuProjectNumber
+    .trim()
+    .replace(/[^a-zA-Z0-9-_]+/g, '_');
+  const filename = projectSlug
+    ? `Audit_Report_${companySlug}_${projectSlug}.xlsx`
+    : `Audit_Report_${companySlug}.xlsx`;
+
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(url);
+}

@@ -1,0 +1,119 @@
+{
+  "templateRevision": "CU SLAB - Rev 01",
+  "auditTypes": [
+    "Initial Stage 01",
+    "Initial Stage 02",
+    "Surveillance",
+    "Recertification"
+  ],
+  "schemes": [
+    {
+      "code": "9001",
+      "shortLabel": "QMS",
+      "standardCode": "ISO 9001",
+      "fullName": "Quality Management System"
+    },
+    {
+      "code": "14001",
+      "shortLabel": "EMS",
+      "standardCode": "ISO 14001",
+      "fullName": "Environmental Management System"
+    },
+    {
+      "code": "45001",
+      "shortLabel": "OHS",
+      "standardCode": "ISO 45001",
+      "fullName": "Occupational Health and Safety Management System"
+    }
+  ],
+  "accreditedEntities": [
+    {
+      "code": "SLAB",
+      "label": "SLAB",
+      "fullName": "Sri Lanka Accreditation Board (SLAB)"
+    },
+    {
+      "code": "SWEDAC",
+      "label": "SWEDAC",
+      "fullName": "Swedish Board for Accreditation and Conformity Assessment (SWEDAC)"
+    }
+  ],
+  "staticContent": {
+    "reportTitle": "Audit",
+    "introductionText": "This report summarizes the results and conclusions from the performed audit. The audit is performed as a formal part of the certification process with the aim to obtain or maintain certification of the management system. The key objective of a management system audit is to determine the conformity of the management system with the standard. Additionally to evaluate the effectiveness of the management system to ensure your organization is capable to achieve specified objectives and meet applicable statutory, regulatory and contractual requirements.",
+    "organizationHeading": "Control Union Inspection",
+    "confidentialityStatement": "The contents of this report, including audit notes and completed checklists, are treated as confidential by Control Union and will not be disclosed to any third party without the client's written consent, except where disclosure is required by accreditation bodies, regulatory authorities, or applicable legal requirements.",
+    "disclaimerText": "Control Union certification audits are based on the verification of a sample of available information; therefore, audit findings are subject to a degree of uncertainty. The absence of nonconformities does not necessarily indicate full compliance. Certification decisions and audit conclusions may be subject to an independent internal technical review by Control Union, particularly where major nonconformities are identified.",
+    "auditConclusionLead": "The audit was conducted in accordance with applicable Control Union certification procedures and the requirements of the relevant management system standard. Based on the audit objectives, scope, and sampled evidence reviewed, the management system is considered:",
+    "auditorDeclarationText": "Based on the evidence obtained during the audit, the management system is considered effective and the above recommendation is supported."
+  },
+  "conclusionItems": [
+    {
+      "id": "objectives_achieved",
+      "text": "Audit objectives achieved and sufficient objective evidence obtained."
+    },
+    {
+      "id": "duration_competence_adequate",
+      "text": "Audit duration, audit team competence, FTE, site coverage, process complexity, and sampling were adequate to support the audit conclusion."
+    },
+    {
+      "id": "changes_reviewed",
+      "text": "Changes affecting the management system, scope, locations, products, services, and processes were reviewed and addressed as applicable."
+    },
+    {
+      "id": "previous_ncs_closed",
+      "text": "Previous nonconformities and corrective actions were verified and effectively closed, where applicable."
+    },
+    {
+      "id": "corrective_actions_due",
+      "text": "Corrective actions for current nonconformities are required by:",
+      "requiresDate": true
+    },
+    {
+      "id": "internal_audits_mgmt_review",
+      "text": "Internal audits and management reviews were implemented and effective."
+    },
+    {
+      "id": "system_suitable_effective",
+      "text": "The management system continues to be suitable, adequate, effective, and capable of achieving its intended outcomes."
+    },
+    {
+      "id": "legal_compliance",
+      "text": "The organization demonstrates compliance with applicable standard, legal, regulatory, and other requirements."
+    },
+    {
+      "id": "risks_opportunities_managed",
+      "text": "Risks and opportunities are identified and managed appropriately."
+    },
+    {
+      "id": "no_unresolved_issues",
+      "text": "No unresolved issues were identified that would adversely affect confidence in certification."
+    },
+    {
+      "id": "closing_meeting_communicated",
+      "text": "Audit findings, conclusions, nonconformities (if any), corrective action timelines, and the certification decision process were communicated and understood during the closing meeting."
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "recommend_initial",
+      "label": "Recommend Certification / Initial Approval"
+    },
+    {
+      "id": "recommend_continuation",
+      "label": "Recommend Continuation of Certification"
+    },
+    {
+      "id": "recommend_renewal",
+      "label": "Recommend Renewal of Certification"
+    },
+    {
+      "id": "recommend_subject_to_closure",
+      "label": "Recommend Certification Subject to Successful Closure of Nonconformities"
+    },
+    {
+      "id": "do_not_recommend",
+      "label": "Do Not Recommend Certification at This Stage"
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "id": "clause-4-5",
+  "sheetName": "Clause 4 and 5",
+  "navLabel": "Clause 4 & 5",
+  "clauses": [
+    {
+      "id": "4.1",
+      "title": "4.1 Context",
+      "description": "Effectiveness of arrangements for identifying, monitoring and reviewing strategic, operational, cultural, ethical, technological, regulatory, environmental, economic and sustainability-related internal and external issues that may affect achievement of intended management system outcomes and strategic objectives.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "The process is considered to be effective and no nonconformities towards the requirements of the standard were identified. The conclusion is based on interviews with relevant managers and verification of the following activities and records:",
+      "outcomeB": "The process is considered effective and in compliance with the standard, except for the findings listed in the List of Findings. The following records were assessed as basis for the conclusion:"
+    },
+    {
+      "id": "4.2",
+      "title": "4.2 Need & Expectation of Interested Parties",
+      "description": "Adequately addressing relevant interested parties and their applicable requirements which may influence organizational performance, compliance and intended outcomes.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Relevant interested parties and their applicable requirements have been sufficiently identified, reviewed, and considered within the management system. No nonconformities were identified. The conclusion is based on interviews and verification of applicable records and activities.",
+      "outcomeB": "Interested parties and their requirements have been identified; however, the findings listed in the List of Findings indicate gaps in determining, monitoring, or addressing applicable requirements. The conclusion is based on interviews and verification of relevant records."
+    },
+    {
+      "id": "4.3",
+      "title": "4.3 Scope",
+      "description": "Suitability and relevance of the defined management system scope considering organizational context, strategic direction, activities, products, services and stakeholder expectations.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "The scope of the management system is clearly defined, documented, and appropriate to the organization's activities, products and services. No nonconformities were identified. The conclusion is based on interviews and review of documented information.",
+      "outcomeB": "The management system scope has been established; however, the findings listed in the List of Findings indicate deficiencies affecting its completeness or suitability. The conclusion is based on verified records and discussions with responsible personnel."
+    },
+    {
+      "id": "4.4",
+      "title": "4.4 Management System",
+      "description": "Sufficiency and integration of management system processes, including interactions, responsibilities, controls, performance measures and improvement arrangements, to achieve intended outcomes.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Management system processes, interactions, responsibilities, inputs, outputs, controls, and performance measures have been suitably established and maintained. No nonconformities were identified. This conclusion is based on interviews and verification of process-related records.",
+      "outcomeB": "Management system processes have been established; however, the findings listed in the List of Findings indicate gaps affecting process control, implementation, or intended results. The conclusion is based on review of relevant activities and records."
+    },
+    {
+      "id": "5.1",
+      "title": "5.1 Leadership",
+      "description": "Demonstration of leadership commitment through active promotion of quality culture, environmental stewardship, worker wellbeing, ethics and integrity, accountability, customer focus, sustainability principles, risk-based thinking, compliance obligations, continual improvement and achievement of strategic and management system objectives.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Top management demonstrates leadership and commitment by aligning the management system with the organization's direction, integrating requirements into business processes, providing resources, promoting accountability, ethics, risk-based thinking, stakeholder focus, and continual improvement. No nonconformities were identified. The conclusion is based on interviews and verification of relevant activities and records.",
+      "outcomeB": "Leadership arrangements are established; however, identified findings indicate weaknesses affecting effective implementation and achievement of intended outcomes."
+    },
+    {
+      "id": "5.2",
+      "title": "5.2 Policy",
+      "description": "Suitability of the policy in supporting the organization's purpose, strategic direction, applicable commitments, compliance obligations, continual improvement, and management system objectives. The policy is effectively communicated, understood, implemented, and aligned with organizational values and operational activities.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "The policy is appropriate, communicated, understood, maintained, and supports objectives, applicable requirements, and continual improvement. No nonconformities were identified. This conclusion is based on interviews and verification of process-related records.",
+      "outcomeB": "The policy is established; however, identified findings indicate deficiencies affecting its suitability, implementation, communication, or alignment with management system requirements."
+    },
+    {
+      "id": "5.3",
+      "title": "5.3 Roles & Responsibilities",
+      "description": "Clarity and accountability of organizational responsibilities, authorities and reporting relationships including process ownership, decision-making responsibilities, governance arrangements, escalation mechanisms and management system accountability required to achieve intended outcomes.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Responsibilities, authorities and accountabilities for management system processes have been clearly assigned, communicated, and understood. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Organizational job roles, responsibilities and authorities assigned; except for the findings listed in the List of Findings. The following records were assessed as basis for the conclusion:"
+    },
+    {
+      "id": "5.4",
+      "title": "5.4 Consultation & Participation (ISO 45001 Only)",
+      "description": "Effectiveness of consultation and participation arrangements in ensuring workers are involved in OH&S decision-making, hazard identification, risk assessment, incident investigation, development of controls, and continual improvement of the OH&S management system.",
+      "applicableSchemes": [
+        "45001"
+      ],
+      "outcomeA": "Worker consultation and participation processes are effectively implemented, enabling employees and worker representatives to contribute to OH&S decision-making and improvement activities. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Consultation and participation arrangements are established; however, the findings listed in the List of Findings indicate limitations affecting effective worker involvement and engagement."
+    }
+  ]
+}

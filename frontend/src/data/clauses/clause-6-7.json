@@ -1,0 +1,259 @@
+{
+  "id": "clause-6-7",
+  "sheetName": "Clause 6 and 7",
+  "navLabel": "Clause 6 & 7",
+  "clauses": [
+    {
+      "id": "6.1-6.1.1",
+      "title": "6.1 - 6.1.1 Actions to address risk & opportunities/General",
+      "description": "Robustness of processes for identifying, evaluating and addressing risks and opportunities arising from organizational context, interested party requirements, business changes, climate-related issues, compliance obligations, operational activities and strategic objectives that may affect management system outcomes.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Risks, opportunities, environmental aspects, compliance obligations, OH&S hazards, and related impacts have been appropriately identified, evaluated, and addressed through planned actions. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Risk and opportunity management processes have been established; however, the findings listed in the List of Findings indicate deficiencies affecting identification, evaluation, or treatment activities."
+    },
+    {
+      "id": "6.1.2-9001",
+      "title": "6.1.2 - Actions to address risks (ISO 9001)",
+      "description": "Adequacy of identifying and addressing risks and opportunities related to product and service conformity, customer satisfaction, process performance, business continuity and achievement of intended QMS outcomes.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "The processes for identifying, evaluating and addressing risks and opportunities affecting product and service conformity, customer satisfaction, process performance and intended QMS outcomes have been effectively established and implemented. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Risks and opportunities affecting product and service conformity, customer satisfaction, process performance and intended QMS outcomes have been identified and managed; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "6.1.2-14001",
+      "title": "6.1.2 - Environmental aspects (ISO 14001)",
+      "description": "Adequacy of identifying environmental aspects and impacts, considering life cycle perspective, resource use, emissions, waste generation, climate change, biodiversity, operational conditions and emergencies, including determination of significant environmental aspects.",
+      "applicableSchemes": [
+        "14001"
+      ],
+      "outcomeA": "Environmental aspects and impacts have been systematically identified and evaluated, considering life cycle perspective, resource use, emissions, waste generation, biodiversity, climate-related factors and emergency situations. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Environmental aspects, impacts and significance criteria have been established and applied, including consideration of life cycle perspective and significant environmental aspects; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "6.1.2-45001",
+      "title": "6.1.2 - Hazard identification and assessment of risks and opportunities (ISO 45001)",
+      "description": "Adequacy of identifying OH&S hazards and assessing risks and opportunities associated with activities, workers, contractors, workplace conditions, organizational changes and emergencies, including hazard elimination, risk reduction and application of the hierarchy of controls.",
+      "applicableSchemes": [
+        "45001"
+      ],
+      "outcomeA": "Hazards and OH&S risks and opportunities have been effectively identified and assessed, considering routine and non-routine activities, workers, contractors, organizational changes, workplace conditions and emergency situations. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Hazard identification and OH&S risk and opportunity assessment processes have been established and implemented, including consideration of worker participation, hazard elimination and risk reduction measures; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "6.1.3-9001",
+      "title": "6.1.3 Actions to address opportunities (ISO 9001)",
+      "description": "Adequacy of planning and implementation of actions to address identified risks and opportunities, including integration into QMS processes, allocation of resources, assignment of responsibilities, monitoring of implementation, and evaluation of effectiveness to achieve intended QMS outcomes.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Actions to address identified risks and opportunities have been planned, implemented, integrated into relevant processes, and monitored to support product and service conformity, customer satisfaction and intended QMS outcomes. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Actions to address identified risks and opportunities have been established and implemented; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "6.1.3-14001",
+      "title": "6.1.3 Compliance Obligations (ISO 14001)",
+      "description": "Robustness of processes for identifying, determining access to, evaluating and maintaining applicable legal and other compliance obligations related to environmental aspects, activities, products and services, ensuring their integration into EMS processes and operational controls.",
+      "applicableSchemes": [
+        "14001"
+      ],
+      "outcomeA": "Applicable legal and other environmental compliance obligations have been identified, maintained and considered within EMS processes and operational controls. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Environmental compliance obligations have been identified and incorporated into EMS processes and controls; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "6.1.3-45001",
+      "title": "6.1.3 Determination of legal requirements and other requirements (ISO 45001)",
+      "description": "Robustness of processes for identifying, accessing, maintaining and applying applicable legal requirements and other OH&S requirements relating to hazards, risks, activities, workplace conditions and workers, ensuring integration into the OH&S management system.",
+      "applicableSchemes": [
+        "45001"
+      ],
+      "outcomeA": "Applicable legal and other OH&S requirements have been identified, maintained and considered in OH&S management system processes and controls. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Applicable legal and other OH&S requirements have been identified and integrated into OH&S management system processes and controls; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "6.1.4-14001",
+      "title": "6.1.4 Risks & Opportunities (ISO 14001)",
+      "description": "Adequacy of planning and implementation of actions to address significant environmental aspects, compliance obligations, environmental risks, opportunities and climate-related issues.",
+      "applicableSchemes": [
+        "14001"
+      ],
+      "outcomeA": "Actions to address significant environmental aspects, compliance obligations, environmental risks and opportunities have been effectively planned, implemented and integrated into environmental management system processes and operational controls. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Actions to address significant environmental aspects, compliance obligations, environmental risks and opportunities have been established and implemented; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "6.1.5-14001",
+      "title": "6.1.5 Planning actions (ISO 14001)",
+      "description": "Adequacy of monitoring and evaluation arrangements to determine the effectiveness of actions taken to address environmental aspects, compliance obligations, risks and opportunities and achieve intended EMS outcomes.",
+      "applicableSchemes": [
+        "14001"
+      ],
+      "outcomeA": "The effectiveness of actions taken to address significant environmental aspects, compliance obligations, environmental risks and opportunities has been systematically monitored and evaluated to support intended EMS outcomes and continual improvement. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Arrangements for monitoring and evaluating the effectiveness of actions addressing significant environmental aspects, compliance obligations, environmental risks and opportunities have been established and implemented; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "6.2",
+      "title": "6.2 Objectives & planning to achieve",
+      "description": "Adequacy and suitability of management system objectives and planning arrangements to support policy commitments, strategic direction, intended outcomes, legal and other requirements, and identified risks and opportunities, including defined actions, responsibilities, resources, performance indicators, timelines, monitoring, evaluation, and continual improvement.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Management system objectives and associated plans have been established, implemented, and monitored to support policy commitments, strategic direction, intended outcomes, legal and other requirements, and continual improvement. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Management system objectives and/or planning arrangements were not fully effective in supporting policy commitments, intended outcomes, legal and other requirements, or continual improvement. Deficiencies identified are detailed in the List of Findings."
+    },
+    {
+      "id": "6.3",
+      "title": "6.3 – Planning of Changes",
+      "description": "Adequacy of arrangements for planning, evaluating and controlling changes to management system processes, resources, responsibilities, technologies and operational activities, considering potential consequences, risks, opportunities and management system integrity.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Changes affecting the management system have been suitably planned, evaluated and implemented, considering potential consequences, resource requirements, responsibilities and system integrity. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Changes affecting the management system have been planned and controlled; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "7.1-7.1.1",
+      "title": "7.1/7.1.1 – Resources",
+      "description": "Adequacy of determining, providing and maintaining the people, infrastructure, work environment, monitoring resources, organizational knowledge and other resources necessary for the establishment, implementation, maintenance and continual improvement of the management system and achievement of intended outcomes.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Resources required for the effective implementation, maintenance and continual improvement of the management system have been adequately determined, provided and maintained. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Resources necessary for management system implementation and operation have been determined and provided; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "7.1.2",
+      "title": "7.1.2 - People (ISO 9001)",
+      "description": "Adequacy of determining and providing competent persons necessary to effectively operate, control and improve management system processes and achieve intended results.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Competent personnel required for effective management system implementation and operational control have been determined and made available. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Personnel requirements have been identified and resources assigned; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "7.1.3",
+      "title": "7.1.3 Infrastructure (ISO 9001)",
+      "description": "Adequacy of infrastructure, facilities, equipment, utilities, information and communication technology, transportation and supporting services necessary to achieve intended management system outcomes.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Infrastructure required for effective operation of management system processes has been established and maintained. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Infrastructure necessary to support management system processes has been provided and maintained; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "7.1.4",
+      "title": "7.1.4 Environment for the Operation of Processes (ISO 9001)",
+      "description": "Adequacy of environmental, social, psychological and physical conditions necessary to achieve conformity of products and services and effective process performance.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Suitable conditions for the operation of processes have been established and maintained to support product and service conformity. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Conditions necessary for effective process operation and product/service conformity have been established; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "7.1.5",
+      "title": "7.1.5 Monitoring and Measuring Resources (ISO 9001)",
+      "description": "Adequacy of monitoring and measuring resources, including calibration, verification and traceability controls, to ensure valid, reliable and consistent measurement results supporting product and service conformity, process performance and intended QMS outcomes.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Monitoring and measuring resources have been adequately determined, maintained, calibrated or verified as applicable, and controlled to ensure valid, reliable and traceable measurement results supporting product and service conformity, process performance and intended QMS outcomes. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Monitoring and measuring resources, including calibration, verification and traceability arrangements, have been established and implemented to support product and service conformity and process performance; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "7.2",
+      "title": "7.2 – Competence",
+      "description": "Adequacy of processes for determining, attaining, maintaining and evaluating competence of personnel performing work under the organization's control, including education, training, skills, experience and actions taken to address competency gaps affecting management system performance and intended outcomes.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Competency requirements have been identified and personnel performing relevant activities have been determined competent based on appropriate education, training, skills and experience. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Competency requirements and development arrangements have been established and implemented; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "7.3",
+      "title": "7.3 – Awareness",
+      "description": "Effectiveness of arrangements to ensure personnel are aware of the management system policy, relevant objectives, their contribution to system effectiveness, implications of nonconformance, and responsibilities relating to management system performance.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Relevant personnel demonstrated awareness of the management system policy, objectives, responsibilities and their contribution to achieving intended outcomes. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Management system awareness arrangements have been established and implemented; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "7.4",
+      "title": "7.4 – Communication",
+      "description": "Adequacy of internal and external communication processes, including determination of what, when, with whom and how information is communicated to ensure effective management system implementation, stakeholder engagement and achievement of intended outcomes.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Internal and external communication processes have been established and effectively implemented to support management system requirements and organizational objectives. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Communication processes and responsibilities have been established and implemented; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "7.5",
+      "title": "7.5 – Documented Information",
+      "description": "Adequacy of processes for creation, updating, maintenance, retention and control of documented information required to support management system effectiveness, operational consistency, compliance and evidence of conformity.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Documented information necessary for effective management system operation has been appropriately created, maintained, protected and controlled. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Documented information control arrangements have been established and implemented; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "7.5.1",
+      "title": "7.5.1 – General",
+      "description": "Adequacy of documented information required by the management system and the applicable standard, including documents and records necessary to support process effectiveness and demonstrate conformity.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Required documented information has been established, maintained and retained to support management system effectiveness and demonstrate conformity. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Required documented information has been established and maintained; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "7.5.2",
+      "title": "7.5.2 – Creating and Updating",
+      "description": "Adequacy of controls for creating, reviewing, approving, identifying, formatting and updating documented information to ensure suitability, accuracy, consistency and availability for intended use.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Documented information is appropriately identified, reviewed, approved and updated to ensure suitability and adequacy prior to use. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Processes for creating and updating documented information have been established and implemented; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "7.5.3",
+      "title": "7.5.3 – Control of Documented Information",
+      "description": "Effectiveness of controls to ensure documented information is available, suitable for use, adequately protected, distributed, accessed, stored, preserved, retrieved, retained and disposed of in a controlled manner throughout its lifecycle.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Documented information is effectively controlled to ensure availability, protection, accessibility, retention and preservation, while preventing unintended use of obsolete information. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Controls for documented information, including access, distribution, retention and disposition, have been established and implemented; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    }
+  ]
+}

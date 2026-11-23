@@ -1,0 +1,318 @@
+{
+  "id": "clause-8",
+  "sheetName": "Clause 8",
+  "navLabel": "Clause 8",
+  "clauses": [
+    {
+      "id": "8.1",
+      "title": "8.1 Operational Planning and Control",
+      "description": "Effectiveness of operational planning and control arrangements, including defined criteria, process controls, resource allocation, change management, outsourced activities and monitoring mechanisms to ensure achievement of intended management system outcomes.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Operational processes have been planned, implemented and controlled in accordance with established criteria and management system requirements. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Operational planning and control arrangements have been established and implemented; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "8.1.2",
+      "title": "8.1.2 Eliminating Hazards and Reducing OH&S Risks (45001)",
+      "description": "Effectiveness of arrangements for hazard elimination and OH&S risk reduction through application of the hierarchy of controls.",
+      "applicableSchemes": [
+        "45001"
+      ],
+      "outcomeA": "Hazard elimination and risk reduction measures have been implemented using the hierarchy of controls. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Hazard elimination and risk control arrangements have been established and implemented; except for the findings listed in the List of Findings."
+    },
+    {
+      "id": "8.1.3",
+      "title": "8.1.3 Management of Change (45001)",
+      "description": "Adequacy of arrangements for evaluating and controlling temporary and permanent changes that may affect OH&S performance.",
+      "applicableSchemes": [
+        "45001"
+      ],
+      "outcomeA": "Changes affecting OH&S performance have been systematically evaluated and controlled. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Management of change arrangements have been established and implemented; except for the findings listed in the List of Findings."
+    },
+    {
+      "id": "8.1.4",
+      "title": "8.1.4 Procurement (45001)",
+      "description": "Effectiveness of procurement, contractor and outsourcing controls to ensure OH&S requirements are identified, communicated and integrated into purchasing processes, contractor activities and outsourced functions, including management of associated hazards, risks and legal requirements.",
+      "applicableSchemes": [
+        "45001"
+      ],
+      "outcomeA": "Procurement, contractor and outsourcing processes have been effectively controlled to ensure OH&S requirements are identified, communicated and implemented, with appropriate measures established to manage associated hazards and risks. No nonconformities were identified. The conclusion is based on interviews with relevant personnel and verification of the following activities and records:",
+      "outcomeB": "Procurement, contractor and outsourcing controls have been established and implemented to address OH&S requirements and associated risks; except for the findings listed in the List of Findings. The following activities and records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "8.2-ems-ohs",
+      "title": "8.2 Emergency Preparedness and Response (EMS & OHS)",
+      "description": "Effectiveness of emergency preparedness and response arrangements, including identification of potential emergency situations, response planning, impact mitigation, emergency testing, personnel involvement and continual improvement of emergency response capability.",
+      "applicableSchemes": [
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Emergency preparedness and response arrangements have been effectively established, implemented, tested and reviewed to manage potential emergency situations and minimize adverse environmental, health and safety impacts. No nonconformities were identified. The conclusion is based on interviews with relevant personnel and verification of the following activities and records:",
+      "outcomeB": "Emergency preparedness and response arrangements have been established and implemented, including identification of potential emergency situations, response planning, testing and review activities; except for the findings listed in the List of Findings. The following activities and records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "8.2-qms",
+      "title": "8.2 Requirements for Products and Services (QMS)",
+      "description": "Effectiveness of determining, reviewing, communicating and controlling customer and applicable statutory, regulatory and organizational requirements relating to products and services.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Requirements for products and services have been adequately determined, reviewed and communicated. No nonconformities were identified. The conclusion is based on interviews with relevant personnel and verification of the following activities and records:",
+      "outcomeB": "Processes for determining and managing product and service requirements have been established and implemented; except for the findings listed in the List of Findings."
+    },
+    {
+      "id": "8.2.1",
+      "title": "8.2.1 Customer Communication (QMS)",
+      "description": "Effectiveness of customer communication processes relating to product and service information, enquiries, contracts, orders, changes, feedback, complaints and contingency actions.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Customer communication processes have been effectively established and implemented to ensure customer requirements and feedback are appropriately managed. No nonconformities were identified. The conclusion is based on interviews with relevant personnel and verification of the following activities and records:",
+      "outcomeB": "Customer communication processes have been established and implemented; except for the findings listed in the List of Findings."
+    },
+    {
+      "id": "8.2.2",
+      "title": "8.2.2 Determining Requirements (QMS)",
+      "description": "Adequacy of determining customer, statutory, regulatory and organizational requirements applicable to products and services.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Product and service requirements have been adequately determined and documented to ensure customer and applicable requirements are met. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Processes for determining product and service requirements have been established and implemented; except for the findings listed in the List of Findings."
+    },
+    {
+      "id": "8.2.3",
+      "title": "8.2.3 Review of Requirements (QMS)",
+      "description": "Effectiveness of reviewing requirements prior to acceptance to ensure organizational capability to meet customer, statutory and regulatory requirements.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Product and service requirements are reviewed prior to commitment, ensuring capability to meet specified requirements. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Requirement review arrangements have been established and implemented; except for the findings listed in the List of Findings."
+    },
+    {
+      "id": "8.2.4",
+      "title": "8.2.4 Changes to Requirements (QMS)",
+      "description": "Adequacy of controls for reviewing, approving and communicating changes to product and service requirements.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Changes to customer and product requirements have been effectively reviewed, approved and communicated. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Requirement change controls have been established and implemented; except for the findings listed in the List of Findings."
+    },
+    {
+      "id": "8.3",
+      "title": "8.3 Design & Development (9001)",
+      "description": "Effectiveness of design and development arrangements to ensure products and services achieve intended requirements and outcomes.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Design and development arrangements were effectively established, implemented, and maintained to ensure products and services achieve intended requirements and outcomes. No nonconformities were identified. This conclusion is based on interviews, review of documented information, and verification of design planning, inputs, controls, reviews, verification/validation activities, outputs, and change management records.",
+      "outcomeB": "Processes for design planning, inputs, outputs, reviews, verification, validation, and change control have been established and implemented; except for the findings listed in the List of Findings.",
+      "supportsNotApplicable": true,
+      "outcomeC": "Clause 8.3 is not applicable, as the organization does not perform design and development activities and operates solely to customer-provided specifications and requirements."
+    },
+    {
+      "id": "8.3.1",
+      "title": "8.3.1 General",
+      "description": "Effectiveness of design and development arrangements to ensure products and services achieve intended requirements and outcomes.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Design and development activities have been effectively managed to achieve intended product and service requirements. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Design and development controls have been established and implemented; except for the findings listed in the List of Findings.",
+      "parentClauseId": "8.3"
+    },
+    {
+      "id": "8.3.2",
+      "title": "8.3.2 Planning",
+      "description": "Adequacy of design and development planning, including stages, responsibilities, resources, controls and verification activities.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Design and development activities have been planned with appropriate responsibilities, resources and controls. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Design and development planning arrangements have been established and implemented; except for the findings listed in the List of Findings.",
+      "parentClauseId": "8.3"
+    },
+    {
+      "id": "8.3.3",
+      "title": "8.3.3 Inputs",
+      "description": "Suitability and completeness of design and development inputs, including functional, performance, statutory, regulatory and previous design requirements.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Design and development inputs have been adequately defined, reviewed and maintained. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Design and development inputs have been determined and controlled; except for the findings listed in the List of Findings.",
+      "parentClauseId": "8.3"
+    },
+    {
+      "id": "8.3.4",
+      "title": "8.3.4 Controls",
+      "description": "Effectiveness of reviews, verification, validation and approval activities throughout the design and development process.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Design and development controls have been effectively implemented to verify achievement of specified requirements. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Design and development control processes have been established and implemented; except for the findings listed in the List of Findings.",
+      "parentClauseId": "8.3"
+    },
+    {
+      "id": "8.3.5",
+      "title": "8.3.5 Outputs",
+      "description": "Adequacy of design and development outputs in meeting input requirements and providing information for subsequent processes.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Design and development outputs adequately meet specified input requirements and operational needs. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Design and development outputs have been established and controlled; except for the findings listed in the List of Findings.",
+      "parentClauseId": "8.3"
+    },
+    {
+      "id": "8.3.6",
+      "title": "8.3.6 Changes",
+      "description": "Effectiveness of identifying, reviewing, controlling and approving design and development changes.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Design and development changes have been appropriately reviewed, controlled and approved. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Design change controls have been established and implemented; except for the findings listed in the List of Findings.",
+      "parentClauseId": "8.3"
+    },
+    {
+      "id": "8.4",
+      "title": "8.4 Control of Externally Provided Processes, Products and Services (QMS)",
+      "description": "Effectiveness of processes for selection, evaluation, monitoring and control of external providers, outsourced processes, externally provided products and services, ensuring conformity to specified requirements and achievement of intended quality outcomes.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Externally provided processes, products and services have been effectively evaluated, controlled and monitored to ensure conformity with specified requirements and intended quality outcomes. No nonconformities were identified. The conclusion is based on interviews with relevant personnel and verification of the following activities and records:",
+      "outcomeB": "Controls for externally provided processes, products and services have been established and implemented; except for the findings listed in the List of Findings. The following activities and records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "8.4.1",
+      "title": "8.4.1 General",
+      "description": "Adequacy of controls applied to externally provided processes, products and services to ensure they do not adversely affect product and service conformity or customer satisfaction.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Appropriate controls have been established for externally provided processes, products and services to ensure conformity with requirements. No nonconformities were identified. The conclusion is based on interviews with relevant personnel and verification of the following activities and records:",
+      "outcomeB": "Controls for externally provided processes, products and services have been established and implemented; except for the findings listed in the List of Findings. The following activities and records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "8.4.2",
+      "title": "8.4.2 Type and Extent of Control",
+      "description": "Suitability of criteria used to determine the type and extent of controls applied to external providers based on their impact on product and service conformity and quality performance.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "The type and extent of controls applied to external providers have been appropriately determined and implemented based on associated quality risks and impacts. No nonconformities were identified. The conclusion is based on interviews with relevant personnel and verification of the following activities and records:",
+      "outcomeB": "Criteria for determining and applying controls to external providers have been established and implemented; except for the findings listed in the List of Findings. The following activities and records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "8.4.3",
+      "title": "8.4.3 Information for External Providers",
+      "description": "Adequacy of communication of quality, technical, statutory, regulatory, competence, performance and verification requirements to external providers.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Requirements communicated to external providers adequately define product, service, process and quality expectations to ensure conformity with specified requirements. No nonconformities were identified. The conclusion is based on interviews with relevant personnel and verification of the following activities and records:",
+      "outcomeB": "Requirements for externally provided products, services and processes have been communicated and controlled; except for the findings listed in the List of Findings. The following activities and records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "8.5",
+      "title": "8.5 Production and Service Provision (QMS)",
+      "description": "Adequacy of production and service provision processes, including operational controls, identification and traceability, preservation, customer property, post-delivery activities, and change management, to ensure conformity of products and services to requirements.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Production and service provision controls have been effectively established and implemented to ensure products and services conform to specified requirements. No nonconformities were identified. This conclusion is based on interviews, observation of activities, and verification of relevant records.",
+      "outcomeB": "Production and service provision controls were not fully effective in ensuring conformity of products and services to specified requirements. Deficiencies identified are detailed in the List of Findings."
+    },
+    {
+      "id": "8.5.1",
+      "title": "8.5.1 Control of Production and Service Provision",
+      "description": "Effectiveness of operational controls, documented information, monitoring activities, competent personnel, infrastructure and process conditions necessary to ensure consistent product and service conformity.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Production and service provision processes have been conducted under controlled conditions to ensure consistent achievement of specified requirements. No nonconformities were identified. The conclusion is based on interviews with relevant personnel and verification of the following activities and records:",
+      "outcomeB": "Controlled conditions for production and service provision have been established and implemented; except for the findings listed in the List of Findings. The following activities and records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "8.5.2",
+      "title": "8.5.2 Identification and Traceability",
+      "description": "Adequacy of identification and traceability arrangements for products, services and process outputs to ensure status, integrity and traceability requirements are maintained.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Products, services and process outputs have been appropriately identified and traceability requirements have been effectively maintained where applicable. No nonconformities were identified. The conclusion is based on interviews with relevant personnel and verification of the following activities and records:",
+      "outcomeB": "Identification and traceability controls have been established and implemented; except for the findings listed in the List of Findings. The following activities and records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "8.5.3",
+      "title": "8.5.3 Property Belonging to Customers or External Providers",
+      "description": "Effectiveness of arrangements for receiving, safeguarding, protecting, maintaining and reporting loss, damage or unsuitability of customer or external provider property.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Customer and external provider property has been appropriately identified, protected and controlled throughout its use or custody. No nonconformities were identified. The conclusion is based on interviews with relevant personnel and verification of the following activities and records:",
+      "outcomeB": "Controls for customer and external provider property have been established and implemented; except for the findings listed in the List of Findings. The following activities and records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "8.5.4",
+      "title": "8.5.4 Preservation",
+      "description": "Effectiveness of preservation controls to maintain product conformity throughout production, storage, handling, packaging, transportation and delivery activities.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Appropriate preservation measures have been implemented to maintain product conformity and prevent deterioration or damage. No nonconformities were identified. The conclusion is based on interviews with relevant personnel and verification of the following activities and records:",
+      "outcomeB": "Product preservation controls have been established and implemented; except for the findings listed in the List of Findings. The following activities and records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "8.5.5",
+      "title": "8.5.5 Post-Delivery Activities",
+      "description": "Adequacy of post-delivery arrangements considering customer requirements, statutory and regulatory obligations, product lifecycle impacts, warranty provisions, servicing, maintenance and customer feedback.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Post-delivery activities have been adequately determined and implemented in accordance with customer, statutory and organizational requirements. No nonconformities were identified. The conclusion is based on interviews with relevant personnel and verification of the following activities and records:",
+      "outcomeB": "Post-delivery activities and associated controls have been established and implemented; except for the findings listed in the List of Findings. The following activities and records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "8.5.6",
+      "title": "8.5.6 Control of Changes",
+      "description": "Effectiveness of reviewing, approving, implementing and controlling changes affecting production and service provision to ensure continued conformity with requirements.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Changes affecting production and service provision have been appropriately reviewed, approved and controlled to maintain product and service conformity. No nonconformities were identified. The conclusion is based on interviews with relevant personnel and verification of the following activities and records:",
+      "outcomeB": "Change control processes for production and service provision have been established and implemented; except for the findings listed in the List of Findings. The following activities and records were assessed as the basis for the conclusion:"
+    },
+    {
+      "id": "8.6",
+      "title": "8.6 Release of Products and Services",
+      "description": "Effectiveness of verification and authorization arrangements to ensure products and services meet specified acceptance criteria before release.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Product and service releases are supported by appropriate verification activities and authorization records. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Release controls have been established and implemented; except for the findings listed in the List of Findings."
+    },
+    {
+      "id": "8.7",
+      "title": "8.7 Control of Nonconforming Outputs",
+      "description": "Adequacy of arrangements for identification, segregation, correction, disposition and control of nonconforming outputs to prevent unintended use or delivery.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Nonconforming outputs have been effectively identified, controlled and appropriately addressed. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Nonconformity control arrangements have been established and implemented; except for the findings listed in the List of Findings."
+    }
+  ]
+}

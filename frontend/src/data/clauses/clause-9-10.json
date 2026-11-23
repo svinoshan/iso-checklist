@@ -1,0 +1,100 @@
+{
+  "id": "clause-9-10",
+  "sheetName": "Clause 9 and 10",
+  "navLabel": "Clause 9 & 10",
+  "clauses": [
+    {
+      "id": "9.1",
+      "title": "9.1 Monitoring, Measurement, Analysis and Evaluation",
+      "description": "Effectiveness of monitoring, measurement, analysis and evaluation processes for assessing management system performance, achievement of objectives, compliance status and intended outcomes.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Monitoring, measurement, analysis and evaluation activities have been effectively implemented to support performance assessment and decision-making. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Performance monitoring and evaluation processes have been established and implemented; except for the findings listed in the List of Findings."
+    },
+    {
+      "id": "9.1.2-9001",
+      "title": "9.1.2 Customer Satisfaction (ISO 9001 Only)",
+      "description": "Effectiveness of methods used to obtain, monitor and evaluate customer perceptions regarding fulfilment of customer requirements and expectations.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Customer satisfaction information is monitored and evaluated to support continual improvement and customer focus. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Customer satisfaction monitoring arrangements have been established and implemented; except for the findings listed in the List of Findings."
+    },
+    {
+      "id": "9.1.2-14001-45001",
+      "title": "9.1.2 Compliance Evaluation (ISO 14001 & ISO 45001)",
+      "description": "Effectiveness of processes for evaluating fulfilment of applicable legal and other compliance obligations and taking actions where necessary.",
+      "applicableSchemes": [
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Compliance obligations have been periodically evaluated and evidence of compliance has been maintained. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Compliance evaluation arrangements have been established and implemented; except for the findings listed in the List of Findings."
+    },
+    {
+      "id": "9.2",
+      "title": "9.2 Internal Audit",
+      "description": "Effectiveness of internal audit programmes in evaluating management system conformity, implementation and effectiveness.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Internal audits have been planned and conducted at defined intervals and provide information on management system performance. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Internal audit arrangements have been established and implemented; except for the findings listed in the List of Findings."
+    },
+    {
+      "id": "9.3",
+      "title": "9.3 Management Review",
+      "description": "Adequacy of management review processes to evaluate management system suitability, adequacy, effectiveness, performance trends, opportunities, risks and improvement needs.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Management reviews have been conducted at planned intervals and addressed required inputs and outputs. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Management review processes have been established and implemented; except for the findings listed in the List of Findings."
+    },
+    {
+      "id": "10.1",
+      "title": "10.1 General / Continual Improvement",
+      "description": "Effectiveness of identifying and implementing opportunities to enhance management system performance and achieve intended outcomes.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Improvement opportunities have been identified and actions have been implemented to enhance management system performance. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Improvement processes have been established and implemented; except for the findings listed in the List of Findings."
+    },
+    {
+      "id": "10.2",
+      "title": "10.2 Nonconformity and Corrective Action",
+      "description": "Effectiveness of processes for identifying nonconformities, determining root causes, implementing corrective actions and preventing recurrence.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Nonconformities and corrective actions have been effectively managed, including evaluation of causes and effectiveness of actions taken. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Corrective action processes have been established and implemented; except for the findings listed in the List of Findings."
+    },
+    {
+      "id": "10.3",
+      "title": "10.3 Continual Improvement",
+      "description": "Effectiveness of continual improvement activities to enhance the suitability, adequacy and effectiveness of the management system and improve overall performance and intended outcomes.",
+      "applicableSchemes": [
+        "9001",
+        "14001",
+        "45001"
+      ],
+      "outcomeA": "Continual improvement activities have been implemented to enhance management system performance, effectiveness and achievement of intended outcomes. No nonconformities were identified. The conclusion is based on interviews and verification of the following activities and records:",
+      "outcomeB": "Continual improvement processes have been established and implemented; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion."
+    }
+  ]
+}
