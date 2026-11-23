@@ -132,7 +132,7 @@ export function DraftsModal({
                           {draft.companyName}
                         </span>
                         {isCurrent && (
-                          <span className="rounded-full bg-[#1E3A5F] px-2 py-0.5 text-[10px] font-semibold text-white">
+                          <span className="rounded-full bg-[#1E3A5F] px-2 py-0.5 text-[0.625rem] font-semibold text-white">
                             Active
                           </span>
                         )}
@@ -146,7 +146,7 @@ export function DraftsModal({
                             : 'No scheme',
                         ].join(' · ')}
                       </div>
-                      <div className="mt-0.5 text-[11px] text-slate-400">
+                      <div className="mt-0.5 text-[0.6875rem] text-slate-400">
                         Updated {new Date(draft.updatedAt).toLocaleString()}
                       </div>
                     </div>

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { AccessibilityWidget } from './components/AccessibilityWidget';
 import { AuditDetailsStep } from './components/AuditDetailsStep';
 import { AuditIntroductionStep } from './components/AuditIntroductionStep';
 import { ClauseChecklistStep } from './components/ClauseChecklistStep';
@@ -8,6 +9,7 @@ import { FindingsConclusionStep } from './components/FindingsConclusionStep';
 import { HeaderBar } from './components/HeaderBar';
 import { StepNavigation } from './components/StepNavigation';
 import { AUDIT_CONFIG, CLAUSE_SHEETS } from './data/clauses';
+import { useFontScale } from './hooks/useFontScale';
 import {
   calculateFindingsSummary,
   createEmptyAuditReport,
@@ -46,6 +48,7 @@ export default function App() {
   const [isExporting, setIsExporting] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
+  const fontScaleControls = useFontScale();
 
   useEffect(() => {
     let active = true;
@@ -203,6 +206,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <HeaderBar
+        version={AUDIT_CONFIG.appVersion}
         companyName={report.details.companyName}
         summary={summary}
         isExporting={isExporting}
@@ -212,92 +216,90 @@ export default function App() {
         onExportExcel={() => void handleExportExcel()}
       />
 
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <StepNavigation
+        activeStep={activeStep}
+        onSelectStep={handleSelectStep}
+        report={report}
+        sheets={CLAUSE_SHEETS}
+      />
+
+      <main className="mx-auto max-w-[1600px] px-4 pt-4 pb-16 sm:px-5">
         {exportError && (
-          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-xs text-red-700">
             {exportError}
           </div>
         )}
 
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-          <StepNavigation
-            activeStep={activeStep}
-            onSelectStep={handleSelectStep}
-            report={report}
-            sheets={CLAUSE_SHEETS}
-          />
+        <div className="space-y-4">
+          {activeStep === 'audit-details' && (
+            <AuditDetailsStep
+              details={report.details}
+              config={AUDIT_CONFIG}
+              activeClauseCount={summary.visibleCount}
+              onChange={(details) => setReport((prev) => ({ ...prev, details }))}
+            />
+          )}
 
-          <div className="min-w-0 flex-1 space-y-6">
-            {activeStep === 'audit-details' && (
-              <AuditDetailsStep
-                details={report.details}
-                config={AUDIT_CONFIG}
-                activeClauseCount={summary.visibleCount}
-                onChange={(details) => setReport((prev) => ({ ...prev, details }))}
-              />
+          {activeStep === 'audit-introduction' && (
+            <AuditIntroductionStep
+              introduction={report.introduction}
+              config={AUDIT_CONFIG}
+              onChange={(introduction) =>
+                setReport((prev) => ({ ...prev, introduction }))
+              }
+            />
+          )}
+
+          {activeClauseSheet && (
+            <ClauseChecklistStep
+              sheet={activeClauseSheet}
+              selectedSchemes={report.details.schemes}
+              evaluations={report.evaluations}
+              onUpdateEvaluation={handleUpdateEvaluation}
+              onGoToDetails={() => handleSelectStep('audit-details')}
+            />
+          )}
+
+          {activeStep === 'findings-conclusion' && (
+            <FindingsConclusionStep
+              config={AUDIT_CONFIG}
+              conclusion={report.conclusion}
+              summary={summary}
+              findings={findings}
+              validationIssues={validationIssues}
+              isExporting={isExporting}
+              onChange={(conclusion) =>
+                setReport((prev) => ({ ...prev, conclusion }))
+              }
+              onNavigateStep={handleSelectStep}
+              onExportExcel={() => void handleExportExcel()}
+            />
+          )}
+
+          <div className="flex items-center justify-between border-t border-slate-200 pt-3">
+            {prevStep ? (
+              <button
+                type="button"
+                onClick={() => handleSelectStep(prevStep)}
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                <span>Previous Sheet</span>
+              </button>
+            ) : (
+              <div />
             )}
 
-            {activeStep === 'audit-introduction' && (
-              <AuditIntroductionStep
-                introduction={report.introduction}
-                config={AUDIT_CONFIG}
-                onChange={(introduction) =>
-                  setReport((prev) => ({ ...prev, introduction }))
-                }
-              />
+            {nextStep && (
+              <button
+                type="button"
+                onClick={() => handleSelectStep(nextStep)}
+                className="inline-flex items-center gap-1 rounded-lg bg-[#1E3A5F] px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs transition hover:bg-[#162d4a]"
+              >
+                <span>Next Sheet</span>
+                <ChevronRight className="h-4 w-4" />
+              </button>
             )}
-
-            {activeClauseSheet && (
-              <ClauseChecklistStep
-                sheet={activeClauseSheet}
-                selectedSchemes={report.details.schemes}
-                evaluations={report.evaluations}
-                onUpdateEvaluation={handleUpdateEvaluation}
-                onGoToDetails={() => handleSelectStep('audit-details')}
-              />
-            )}
-
-            {activeStep === 'findings-conclusion' && (
-              <FindingsConclusionStep
-                config={AUDIT_CONFIG}
-                conclusion={report.conclusion}
-                summary={summary}
-                findings={findings}
-                validationIssues={validationIssues}
-                isExporting={isExporting}
-                onChange={(conclusion) =>
-                  setReport((prev) => ({ ...prev, conclusion }))
-                }
-                onNavigateStep={handleSelectStep}
-                onExportExcel={() => void handleExportExcel()}
-              />
-            )}
-
-            <div className="flex items-center justify-between border-t border-slate-200 pt-4">
-              {prevStep ? (
-                <button
-                  type="button"
-                  onClick={() => handleSelectStep(prevStep)}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  <span>Previous Section</span>
-                </button>
-              ) : (
-                <div />
-              )}
-
-              {nextStep && (
-                <button
-                  type="button"
-                  onClick={() => handleSelectStep(nextStep)}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#1E3A5F] px-4 py-2 text-sm font-semibold text-white shadow-xs transition hover:bg-[#162d4a]"
-                >
-                  <span>Next Section</span>
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              )}
-            </div>
           </div>
         </div>
       </main>
@@ -312,6 +314,8 @@ export default function App() {
         onExportJson={() => downloadDraftJsonFile(report)}
         onImportJson={handleImportDraftJson}
       />
+
+      <AccessibilityWidget fontScaleControls={fontScaleControls} />
     </div>
   );
 }

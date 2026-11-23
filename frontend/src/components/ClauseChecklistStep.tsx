@@ -1,4 +1,5 @@
-import { AlertCircle, Info } from 'lucide-react';
+import { useState } from 'react';
+import { AlertCircle, ChevronDown, ChevronUp, Info } from 'lucide-react';
 import {
   getClauseEvaluation,
   getVisibleClausesForSheet,
@@ -29,6 +30,14 @@ const STANDARD_STATUSES: readonly ClauseStatus[] = [
   'Major NC',
 ];
 
+const SHORT_STATUS_LABELS: Record<ClauseStatus, string> = {
+  Comply: 'Comply',
+  Observation: 'Obs',
+  'Minor NC': 'Minor NC',
+  'Major NC': 'Major NC',
+  'N/A': 'N/A',
+};
+
 const SCHEME_BADGE_STYLES: Record<IsoScheme, string> = {
   '9001': 'bg-sky-50 text-sky-700 border-sky-200',
   '14001': 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -37,19 +46,36 @@ const SCHEME_BADGE_STYLES: Record<IsoScheme, string> = {
 
 function getStatusButtonClass(status: ClauseStatus, active: boolean): string {
   if (!active) {
-    return 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50';
+    return 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50';
   }
   switch (status) {
     case 'Comply':
-      return 'border-emerald-600 bg-emerald-600 text-white shadow-xs';
+      return 'border-emerald-600 bg-emerald-600 text-white';
     case 'Observation':
-      return 'border-blue-600 bg-blue-600 text-white shadow-xs';
+      return 'border-blue-600 bg-blue-600 text-white';
     case 'Minor NC':
-      return 'border-amber-500 bg-amber-500 text-white shadow-xs';
+      return 'border-amber-500 bg-amber-500 text-white';
     case 'Major NC':
-      return 'border-red-600 bg-red-600 text-white shadow-xs';
+      return 'border-red-600 bg-red-600 text-white';
     case 'N/A':
-      return 'border-slate-600 bg-slate-600 text-white shadow-xs';
+      return 'border-slate-600 bg-slate-600 text-white';
+  }
+}
+
+function getOutcomeAccentClass(status: ClauseStatus | null): string {
+  switch (status) {
+    case 'Comply':
+      return 'border-l-emerald-500 bg-emerald-50/30';
+    case 'Observation':
+      return 'border-l-blue-500 bg-blue-50/30';
+    case 'Minor NC':
+      return 'border-l-amber-500 bg-amber-50/40';
+    case 'Major NC':
+      return 'border-l-red-500 bg-red-50/40';
+    case 'N/A':
+      return 'border-l-slate-400 bg-slate-50';
+    default:
+      return 'border-l-slate-200 bg-slate-50/40';
   }
 }
 
@@ -60,6 +86,8 @@ export function ClauseChecklistStep({
   onUpdateEvaluation,
   onGoToDetails,
 }: ClauseChecklistStepProps) {
+  const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
+
   const visibleClauses = getVisibleClausesForSheet(
     sheet,
     selectedSchemes,
@@ -71,6 +99,10 @@ export function ClauseChecklistStep({
   ).length;
 
   const hiddenCount = sheet.clauses.length - visibleClauses.length;
+
+  const toggleRowExpand = (clauseId: string) => {
+    setExpandedRows((prev) => ({ ...prev, [clauseId]: !prev[clauseId] }));
+  };
 
   const handleStatusChange = (clause: ClauseDefinition, status: ClauseStatus) => {
     const current = getClauseEvaluation(evaluations, clause.id);
@@ -99,21 +131,21 @@ export function ClauseChecklistStep({
 
   if (selectedSchemes.length === 0) {
     return (
-      <section className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
+      <section className="rounded-xl border border-amber-200 bg-amber-50 p-5">
         <div className="flex items-start gap-3">
           <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
           <div>
-            <h2 className="text-base font-semibold text-amber-900">
+            <h2 className="text-sm font-semibold text-amber-900">
               No ISO Scheme Selected
             </h2>
-            <p className="mt-1 text-sm text-amber-800">
+            <p className="mt-1 text-xs text-amber-800">
               Select one or more schemes (ISO 9001, ISO 14001, ISO 45001) in Audit
               Details to load the applicable clauses for {sheet.sheetName}.
             </p>
             <button
               type="button"
               onClick={onGoToDetails}
-              className="mt-3 rounded-lg bg-[#1E3A5F] px-3.5 py-2 text-sm font-medium text-white transition hover:bg-[#162d4a]"
+              className="mt-3 rounded-md bg-[#1E3A5F] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#162d4a]"
             >
               Go to Audit Details
             </button>
@@ -124,32 +156,206 @@ export function ClauseChecklistStep({
   }
 
   return (
-    <section className="space-y-4">
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900">
-              {sheet.sheetName}
-            </h2>
-            <p className="mt-0.5 text-sm text-slate-500">
-              Showing {visibleClauses.length} applicable clause
-              {visibleClauses.length === 1 ? '' : 's'}
-              {hiddenCount > 0
-                ? ` (${hiddenCount} non-applicable clause${hiddenCount === 1 ? '' : 's'} hidden)`
-                : ''}
-            </p>
-          </div>
+    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
+      {/* Compact Sheet Subheader Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 bg-slate-50/80 px-4 py-2.5">
+        <div className="flex flex-wrap items-baseline gap-2">
+          <h2 className="text-sm font-semibold text-slate-900">
+            {sheet.sheetName}
+          </h2>
+          <span className="text-xs text-slate-500">
+            {visibleClauses.length} applicable clause
+            {visibleClauses.length === 1 ? '' : 's'}
+            {hiddenCount > 0 ? ` · ${hiddenCount} hidden` : ''}
+          </span>
+        </div>
 
-          <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
-            <span>Progress:</span>
-            <span className="rounded-full bg-slate-100 px-3 py-1 font-semibold text-[#1E3A5F]">
-              {evaluatedCount} / {visibleClauses.length}
-            </span>
-          </div>
+        <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
+          <span>Evaluated:</span>
+          <span className="rounded-full bg-[#1E3A5F]/10 px-2.5 py-0.5 font-semibold text-[#1E3A5F]">
+            {evaluatedCount} / {visibleClauses.length}
+          </span>
         </div>
       </div>
 
-      <div className="space-y-4">
+      {/* Desktop Workbook Grid (Excel-style Frozen Header + Compact Rows) */}
+      <div className="hidden max-h-[calc(100vh-205px)] overflow-y-auto lg:block">
+        <table className="w-full table-fixed border-collapse text-left">
+          <thead className="sticky top-0 z-10 bg-[#1E3A5F] text-xs font-semibold text-white shadow-xs">
+            <tr className="divide-x divide-white/15">
+              <th className="w-[26%] px-3 py-2">Clause &amp; Description</th>
+              <th className="w-[18%] px-3 py-2">Status</th>
+              <th className="w-[32%] px-3 py-2">Audit Outcome (Auto)</th>
+              <th className="w-[24%] px-3 py-2">Auditor Remarks</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-200 text-xs">
+            {visibleClauses.map((clause, index) => {
+              const evaluation = getClauseEvaluation(evaluations, clause.id);
+              const outcomeText = resolveOutcomeText(clause, evaluation.status);
+              const statuses: readonly ClauseStatus[] = clause.supportsNotApplicable
+                ? [...STANDARD_STATUSES, 'N/A']
+                : STANDARD_STATUSES;
+              const isSchemeSpecific = clause.applicableSchemes.length < 3;
+              const showNcToggle = isNcStatus(evaluation.status);
+              const isExpanded = Boolean(expandedRows[clause.id]);
+
+              return (
+                <tr
+                  key={clause.id}
+                  className={`divide-x divide-slate-200 align-top transition-colors hover:bg-sky-50/35 ${
+                    index % 2 === 1 ? 'bg-slate-50/45' : 'bg-white'
+                  }`}
+                >
+                  {/* Column 1: Clause Title, Scheme Pill & Expandable Description */}
+                  <td className="px-3 py-2.5">
+                    <div className="flex flex-wrap items-start justify-between gap-1">
+                      <span className="font-semibold text-slate-900">
+                        {clause.title}
+                      </span>
+                      {isSchemeSpecific && (
+                        <div className="flex flex-wrap gap-1">
+                          {clause.applicableSchemes.map((scheme) => (
+                            <span
+                              key={scheme}
+                              className={`rounded border px-1.5 py-0.5 text-[0.625rem] font-medium ${SCHEME_BADGE_STYLES[scheme]}`}
+                            >
+                              {scheme}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <p
+                      className={`mt-1 leading-snug text-slate-600 ${
+                        isExpanded ? '' : 'line-clamp-2'
+                      }`}
+                    >
+                      {clause.description}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => toggleRowExpand(clause.id)}
+                      className="mt-1 inline-flex items-center gap-0.5 text-[0.6875rem] font-medium text-[#1E3A5F] hover:underline"
+                    >
+                      {isExpanded ? (
+                        <>
+                          <span>Less</span>
+                          <ChevronUp className="h-3 w-3" />
+                        </>
+                      ) : (
+                        <>
+                          <span>Details</span>
+                          <ChevronDown className="h-3 w-3" />
+                        </>
+                      )}
+                    </button>
+                  </td>
+
+                  {/* Column 2: Compact Status Controls + Conditional NC Open/Closed */}
+                  <td className="px-3 py-2.5">
+                    <div className="flex flex-wrap gap-1">
+                      {statuses.map((status) => (
+                        <button
+                          key={status}
+                          type="button"
+                          title={status}
+                          onClick={() => handleStatusChange(clause, status)}
+                          className={`rounded border px-2 py-1 text-[0.6875rem] font-semibold transition ${getStatusButtonClass(
+                            status,
+                            evaluation.status === status,
+                          )}`}
+                        >
+                          {SHORT_STATUS_LABELS[status]}
+                        </button>
+                      ))}
+                    </div>
+
+                    {showNcToggle && (
+                      <div className="mt-2 flex items-center gap-1.5">
+                        <span className="text-[0.625rem] font-semibold tracking-wide text-slate-500 uppercase">
+                          NC:
+                        </span>
+                        <div className="inline-flex rounded border border-slate-200 bg-white p-0.5">
+                          {(['Open', 'Closed'] as const).map((ncOption) => {
+                            const active = evaluation.ncStatus === ncOption;
+                            return (
+                              <button
+                                key={ncOption}
+                                type="button"
+                                onClick={() =>
+                                  handleNcStatusChange(clause.id, ncOption)
+                                }
+                                className={`rounded px-2 py-0.5 text-[0.625rem] font-semibold transition ${
+                                  active
+                                    ? ncOption === 'Open'
+                                      ? 'bg-red-600 text-white'
+                                      : 'bg-emerald-600 text-white'
+                                    : 'text-slate-600 hover:text-slate-900'
+                                }`}
+                              >
+                                {ncOption}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {clause.id === '8.3' && evaluation.status === 'N/A' && (
+                      <div className="mt-1.5 flex items-center gap-1 text-[0.6875rem] text-slate-600">
+                        <Info className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                        <span>8.3.1–8.3.6 hidden</span>
+                      </div>
+                    )}
+                  </td>
+
+                  {/* Column 3: Auto-Selected Audit Outcome */}
+                  <td className="px-3 py-2.5">
+                    <div
+                      className={`rounded border border-slate-200/80 border-l-3 px-2.5 py-1.5 ${getOutcomeAccentClass(
+                        evaluation.status,
+                      )}`}
+                    >
+                      {outcomeText ? (
+                        <p
+                          className={`leading-relaxed text-slate-700 ${
+                            isExpanded ? '' : 'line-clamp-3'
+                          }`}
+                        >
+                          {outcomeText}
+                        </p>
+                      ) : (
+                        <p className="italic text-slate-400">
+                          Select a status to populate the audit outcome.
+                        </p>
+                      )}
+                    </div>
+                  </td>
+
+                  {/* Column 4: Dedicated Auditor Remarks */}
+                  <td className="px-2.5 py-2">
+                    <textarea
+                      id={`remarks-grid-${clause.id}`}
+                      aria-label={`Auditor remarks for ${clause.title}`}
+                      rows={isExpanded ? 4 : 3}
+                      value={evaluation.remarks}
+                      onChange={(e) =>
+                        handleRemarksChange(clause.id, e.target.value)
+                      }
+                      placeholder="Objective evidence, records, or finding details..."
+                      className="block w-full resize-y rounded border border-slate-200 bg-white px-2 py-1.5 text-xs leading-snug text-slate-900 focus:border-[#1E3A5F] focus:ring-1 focus:ring-[#1E3A5F] focus:outline-none"
+                    />
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Responsive Compact Cards for Mobile / Small Tablets (< lg) */}
+      <div className="divide-y divide-slate-200 lg:hidden">
         {visibleClauses.map((clause) => {
           const evaluation = getClauseEvaluation(evaluations, clause.id);
           const outcomeText = resolveOutcomeText(clause, evaluation.status);
@@ -160,20 +366,17 @@ export function ClauseChecklistStep({
           const showNcToggle = isNcStatus(evaluation.status);
 
           return (
-            <article
-              key={clause.id}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs transition hover:border-slate-300"
-            >
+            <article key={clause.id} className="space-y-2.5 p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
-                <h3 className="text-base font-semibold text-slate-900">
+                <h3 className="text-sm font-semibold text-slate-900">
                   {clause.title}
                 </h3>
                 {isSchemeSpecific && (
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-1">
                     {clause.applicableSchemes.map((scheme) => (
                       <span
                         key={scheme}
-                        className={`rounded-md border px-2 py-0.5 text-xs font-medium ${SCHEME_BADGE_STYLES[scheme]}`}
+                        className={`rounded border px-1.5 py-0.5 text-[0.625rem] font-medium ${SCHEME_BADGE_STYLES[scheme]}`}
                       >
                         ISO {scheme}
                       </span>
@@ -182,21 +385,18 @@ export function ClauseChecklistStep({
                 )}
               </div>
 
-              <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
+              <p className="text-xs leading-relaxed text-slate-600">
                 {clause.description}
               </p>
 
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="mr-1 text-xs font-semibold tracking-wide text-slate-500 uppercase">
-                    Status:
-                  </span>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {statuses.map((status) => (
                     <button
                       key={status}
                       type="button"
                       onClick={() => handleStatusChange(clause, status)}
-                      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${getStatusButtonClass(
+                      className={`rounded border px-2.5 py-1 text-xs font-semibold transition ${getStatusButtonClass(
                         status,
                         evaluation.status === status,
                       )}`}
@@ -207,11 +407,9 @@ export function ClauseChecklistStep({
                 </div>
 
                 {showNcToggle && (
-                  <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1">
-                    <span className="text-xs font-semibold text-slate-600">
-                      NC Status:
-                    </span>
-                    <div className="inline-flex rounded-md bg-white p-0.5 shadow-2xs ring-1 ring-slate-200">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-medium text-slate-600">NC:</span>
+                    <div className="inline-flex rounded border border-slate-200 bg-white p-0.5">
                       {(['Open', 'Closed'] as const).map((ncOption) => {
                         const active = evaluation.ncStatus === ncOption;
                         return (
@@ -221,12 +419,12 @@ export function ClauseChecklistStep({
                             onClick={() =>
                               handleNcStatusChange(clause.id, ncOption)
                             }
-                            className={`rounded px-2.5 py-1 text-xs font-semibold transition ${
+                            className={`rounded px-2 py-0.5 text-xs font-semibold transition ${
                               active
                                 ? ncOption === 'Open'
                                   ? 'bg-red-600 text-white'
                                   : 'bg-emerald-600 text-white'
-                                : 'text-slate-600 hover:text-slate-900'
+                                : 'text-slate-600'
                             }`}
                           >
                             {ncOption}
@@ -239,49 +437,35 @@ export function ClauseChecklistStep({
               </div>
 
               {clause.id === '8.3' && evaluation.status === 'N/A' && (
-                <div className="mt-3 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
-                  <Info className="h-4 w-4 shrink-0 text-slate-500" />
-                  <span>
-                    Sub-clauses 8.3.1 – 8.3.6 are automatically hidden while
-                    Clause 8.3 is marked N/A.
-                  </span>
+                <div className="flex items-center gap-1.5 rounded border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs text-slate-700">
+                  <Info className="h-3.5 w-3.5 shrink-0 text-slate-500" />
+                  <span>Sub-clauses 8.3.1 – 8.3.6 are hidden while 8.3 is N/A.</span>
                 </div>
               )}
 
-              <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50/80 p-3.5">
-                <div className="text-xs font-semibold tracking-wide text-[#1E3A5F] uppercase">
-                  Auto-Selected Audit Outcome
-                </div>
+              <div
+                className={`rounded border border-slate-200 border-l-3 px-3 py-2 text-xs ${getOutcomeAccentClass(
+                  evaluation.status,
+                )}`}
+              >
                 {outcomeText ? (
-                  <p className="mt-1 text-sm leading-relaxed text-slate-700">
-                    {outcomeText}
-                  </p>
+                  <p className="leading-relaxed text-slate-700">{outcomeText}</p>
                 ) : (
-                  <p className="mt-1 text-sm italic text-slate-400">
-                    Select a status above to populate the standard audit outcome
-                    statement.
+                  <p className="italic text-slate-400">
+                    Select a status above to populate the audit outcome.
                   </p>
                 )}
               </div>
 
-              <div className="mt-3">
-                <label
-                  htmlFor={`remarks-${clause.id}`}
-                  className="block text-xs font-semibold tracking-wide text-slate-600 uppercase"
-                >
-                  Auditor Remarks
-                </label>
-                <textarea
-                  id={`remarks-${clause.id}`}
-                  rows={2}
-                  value={evaluation.remarks}
-                  onChange={(e) =>
-                    handleRemarksChange(clause.id, e.target.value)
-                  }
-                  placeholder="Enter verified records, objective evidence, or finding details (exported to the Auditor Remarks column)..."
-                  className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-xs focus:border-[#1E3A5F] focus:ring-2 focus:ring-[#1E3A5F]/20 focus:outline-none"
-                />
-              </div>
+              <textarea
+                id={`remarks-mobile-${clause.id}`}
+                aria-label={`Auditor remarks for ${clause.title}`}
+                rows={2}
+                value={evaluation.remarks}
+                onChange={(e) => handleRemarksChange(clause.id, e.target.value)}
+                placeholder="Auditor remarks / objective evidence..."
+                className="block w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-xs text-slate-900 focus:border-[#1E3A5F] focus:ring-1 focus:ring-[#1E3A5F] focus:outline-none"
+              />
             </article>
           );
         })}
