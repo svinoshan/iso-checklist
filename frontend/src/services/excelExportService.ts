@@ -210,7 +210,12 @@ function buildIntroductionSheet(
   const entityMatch = config.accreditedEntities.find(
     (item) => item.code === report.introduction.accreditedLegalEntity,
   );
-  const entityDisplay = entityMatch ? entityMatch.fullName : '';
+  const accreditationBodyDisplay = entityMatch ? entityMatch.fullName : '';
+  const legalEntityDisplay = entityMatch
+    ? [entityMatch.legalEntityName, entityMatch.legalEntityAddress]
+        .filter(Boolean)
+        .join('\n')
+    : '';
 
   const blocks: readonly { heading: string; body: string }[] = [
     {
@@ -226,8 +231,12 @@ function buildIntroductionSheet(
       body: report.introduction.scopeOfCertification.trim(),
     },
     {
+      heading: 'Accreditation Body',
+      body: accreditationBodyDisplay,
+    },
+    {
       heading: 'Accredited Legal Entity',
-      body: entityDisplay,
+      body: legalEntityDisplay,
     },
     {
       heading: 'Confidentiality Statement',

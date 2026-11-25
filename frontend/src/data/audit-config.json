@@ -31,12 +31,18 @@
     {
       "code": "SLAB",
       "label": "SLAB",
-      "fullName": "Sri Lanka Accreditation Board (SLAB)"
+      "fullName": "Sri Lanka Accreditation Board (SLAB)",
+      "legalEntityName": "Control Union Inspections (Pvt) Ltd.",
+      "legalEntityAddress": "2nd Floor, BAM Musee Tower, 52, Sir Marcus Fernando Mawatha, Colombo 00700, Sri Lanka",
+      "disabled": false
     },
     {
       "code": "SWEDAC",
       "label": "SWEDAC",
-      "fullName": "Swedish Board for Accreditation and Conformity Assessment (SWEDAC)"
+      "fullName": "Swedish Board for Accreditation and Conformity Assessment (SWEDAC)",
+      "legalEntityName": "",
+      "legalEntityAddress": "",
+      "disabled": true
     }
   ],
   "staticContent": {

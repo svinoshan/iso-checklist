@@ -40,6 +40,9 @@ export interface AccreditedEntityOption {
   code: AccreditedEntityCode;
   label: string;
   fullName: string;
+  legalEntityName: string;
+  legalEntityAddress: string;
+  disabled?: boolean;
 }
 
 export interface AuditConclusionItem {
