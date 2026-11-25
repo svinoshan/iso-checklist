@@ -12,18 +12,21 @@
       "code": "9001",
       "shortLabel": "QMS",
       "standardCode": "ISO 9001",
+      "standardVersion": "ISO 9001:2015",
       "fullName": "Quality Management System"
     },
     {
       "code": "14001",
       "shortLabel": "EMS",
       "standardCode": "ISO 14001",
+      "standardVersion": "ISO 14001:2015",
       "fullName": "Environmental Management System"
     },
     {
       "code": "45001",
       "shortLabel": "OHS",
       "standardCode": "ISO 45001",
+      "standardVersion": "ISO 45001:2018",
       "fullName": "Occupational Health and Safety Management System"
     }
   ],
