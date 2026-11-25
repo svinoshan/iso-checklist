@@ -11,6 +11,7 @@ import type {
   AuditConfig,
   AuditReport,
   ClauseSheetDefinition,
+  ClauseStatus,
   FindingRecord,
   FindingsSummary,
 } from '../types/audit';
@@ -59,6 +60,52 @@ const SECTION_FONT: Partial<ExcelJS.Font> = {
   bold: true,
   color: { argb: 'FF1E3A5F' },
 };
+
+interface SheetRowRange {
+  sheetName: string;
+  lastRow: number;
+}
+
+interface ClauseRowLocation {
+  sheetName: string;
+  rowNumber: number;
+}
+
+function escapeExcelSheetName(sheetName: string): string {
+  return `'${sheetName.replace(/'/g, "''")}'`;
+}
+
+function buildCrossSheetStatusCountFormula(
+  ranges: readonly SheetRowRange[],
+  targetStatus: 'Minor NC' | 'Major NC' | 'Observation',
+): string {
+  if (ranges.length === 0) {
+    return '0';
+  }
+  return ranges
+    .map(
+      ({ sheetName, lastRow }) =>
+        `COUNTIF(${escapeExcelSheetName(sheetName)}!C2:C${lastRow},"${targetStatus}")`,
+    )
+    .join('+');
+}
+
+function getStatusFontColor(status: ClauseStatus | null): string {
+  switch (status) {
+    case 'Comply':
+      return 'FF047857';
+    case 'Observation':
+      return 'FF1D4ED8';
+    case 'Minor NC':
+      return 'FFB45309';
+    case 'Major NC':
+      return 'FFB91C1C';
+    case 'N/A':
+      return 'FF475569';
+    default:
+      return 'FF64748B';
+  }
+}
 
 function estimateRowHeight(
   texts: readonly { text: string; widthChars: number }[],
@@ -224,7 +271,7 @@ function buildFindingsAndConclusionSheet(
   report: AuditReport,
   config: AuditConfig,
   summary: FindingsSummary,
-  findingsCount: number,
+  clauseSheetRanges: readonly SheetRowRange[],
 ): void {
   const ws = workbook.addWorksheet('Audit findings & Conclusion');
   configurePrintLayout(ws, false);
@@ -234,11 +281,9 @@ function buildFindingsAndConclusionSheet(
     { key: 'colB', width: 92 },
   ];
 
-  const findingsEndRow = Math.max(findingsCount + 1, 2);
-
   const metricRows: readonly {
     label: string;
-    formula: string;
+    formula?: string;
     result: number;
   }[] = [
     {
@@ -248,22 +293,21 @@ function buildFindingsAndConclusionSheet(
     },
     {
       label: 'Number of Minor NC:',
-      formula: `COUNTIF('List of Findings'!C2:C${findingsEndRow},"Minor NC")`,
+      formula: buildCrossSheetStatusCountFormula(clauseSheetRanges, 'Minor NC'),
       result: summary.minorNcs,
     },
     {
       label: 'Number of Major NC:',
-      formula: `COUNTIF('List of Findings'!C2:C${findingsEndRow},"Major NC")`,
+      formula: buildCrossSheetStatusCountFormula(clauseSheetRanges, 'Major NC'),
       result: summary.majorNcs,
     },
     {
       label: 'Observations:',
-      formula: `COUNTIF('List of Findings'!C2:C${findingsEndRow},"Observation")`,
+      formula: buildCrossSheetStatusCountFormula(clauseSheetRanges, 'Observation'),
       result: summary.observations,
     },
     {
       label: 'Open NC:',
-      formula: `COUNTIFS('List of Findings'!C2:C${findingsEndRow},"Minor NC",'List of Findings'!D2:D${findingsEndRow},"Open")+COUNTIFS('List of Findings'!C2:C${findingsEndRow},"Major NC",'List of Findings'!D2:D${findingsEndRow},"Open")`,
       result: summary.openNcs,
     },
   ];
@@ -279,10 +323,9 @@ function buildFindingsAndConclusionSheet(
     labelCell.alignment = { vertical: 'middle', horizontal: 'left' };
     labelCell.border = THIN_BORDER;
 
-    valueCell.value = {
-      formula: metric.formula,
-      result: metric.result,
-    };
+    valueCell.value = metric.formula
+      ? { formula: metric.formula, result: metric.result }
+      : metric.result;
     valueCell.font = { ...BASE_FONT, bold: true };
     valueCell.alignment = { vertical: 'middle', horizontal: 'left' };
     valueCell.numFmt = '0';
@@ -409,29 +452,42 @@ function buildClauseSheet(
   workbook: ExcelJS.Workbook,
   sheet: ClauseSheetDefinition,
   report: AuditReport,
+  clauseLocations: Map<string, ClauseRowLocation>,
 ): void {
   const ws = workbook.addWorksheet(sheet.sheetName);
   configurePrintLayout(ws, true);
 
   ws.columns = [
-    { key: 'clause', width: 32 },
-    { key: 'description', width: 46 },
-    { key: 'outcome', width: 62 },
-    { key: 'remarks', width: 36 },
+    { key: 'clause', width: 30 },
+    { key: 'description', width: 42 },
+    { key: 'status', width: 15 },
+    { key: 'outcome', width: 58 },
+    { key: 'remarks', width: 34 },
   ];
 
   const headerRow = ws.getRow(1);
-  const headers = ['Clause', 'Clause Description', 'Audit Outcome', 'Auditor Remarks'];
+  const headers = [
+    'Clause',
+    'Clause Description',
+    'Audit Status',
+    'Audit Outcome',
+    'Auditor Remarks',
+  ];
   headers.forEach((title, idx) => {
     const cell = headerRow.getCell(idx + 1);
     cell.value = title;
     cell.font = HEADER_FONT;
     cell.fill = HEADER_FILL;
-    cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+    cell.alignment = {
+      vertical: 'middle',
+      horizontal: idx === 2 ? 'center' : 'left',
+      wrapText: true,
+    };
     cell.border = THIN_BORDER;
   });
   headerRow.height = 26;
   ws.views = [{ state: 'frozen', ySplit: 1 }];
+  ws.autoFilter = 'A1:E1';
 
   const visibleClauses = getVisibleClausesForSheet(
     sheet,
@@ -441,117 +497,43 @@ function buildClauseSheet(
 
   visibleClauses.forEach((clause, index) => {
     const evaluation = getClauseEvaluation(report.evaluations, clause.id);
+    const statusText = evaluation.status ?? '';
     const outcomeText = resolveOutcomeText(clause, evaluation.status);
     const remarksText = evaluation.remarks.trim();
+    const rowNumber = index + 2;
 
-    const row = ws.getRow(index + 2);
-    const values = [clause.title, clause.description, outcomeText, remarksText];
-    const isAlt = index % 2 === 1;
-
-    values.forEach((val, colIdx) => {
-      const cell = row.getCell(colIdx + 1);
-      cell.value = val;
-      cell.font = colIdx === 0 ? { ...BASE_FONT, bold: true } : BASE_FONT;
-      cell.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
-      cell.border = THIN_BORDER;
-      if (isAlt) {
-        cell.fill = ALT_ROW_FILL;
-      }
+    clauseLocations.set(clause.id, {
+      sheetName: sheet.sheetName,
+      rowNumber,
     });
 
-    row.height = estimateRowHeight(
-      [
-        { text: clause.title, widthChars: 32 },
-        { text: clause.description, widthChars: 46 },
-        { text: outcomeText, widthChars: 62 },
-        { text: remarksText, widthChars: 36 },
-      ],
-      15,
-      30,
-    );
-  });
-}
-
-function buildListOfFindingsSheet(
-  workbook: ExcelJS.Workbook,
-  findings: readonly FindingRecord[],
-): void {
-  const ws = workbook.addWorksheet('List of Findings');
-  configurePrintLayout(ws, true);
-
-  ws.columns = [
-    { key: 'num', width: 12 },
-    { key: 'clause', width: 38 },
-    { key: 'type', width: 16 },
-    { key: 'status', width: 14 },
-    { key: 'remarks', width: 64 },
-  ];
-
-  const headerRow = ws.getRow(1);
-  const headers = [
-    'Finding #',
-    'Clause',
-    'Finding Type',
-    'NC Status',
-    'Auditor Remarks / Evidence',
-  ];
-  headers.forEach((title, idx) => {
-    const cell = headerRow.getCell(idx + 1);
-    cell.value = title;
-    cell.font = HEADER_FONT;
-    cell.fill = HEADER_FILL;
-    cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
-    cell.border = THIN_BORDER;
-  });
-  headerRow.height = 26;
-  ws.views = [{ state: 'frozen', ySplit: 1 }];
-
-  if (findings.length === 0) {
-    ws.mergeCells(2, 1, 2, 5);
-    const emptyRow = ws.getRow(2);
-    const cell = emptyRow.getCell(1);
-    cell.value = 'No nonconformities or observations were recorded during this audit.';
-    cell.font = { ...BASE_FONT, italic: true, color: { argb: 'FF475569' } };
-    cell.alignment = { vertical: 'middle', horizontal: 'left' };
-    for (let col = 1; col <= 5; col += 1) {
-      emptyRow.getCell(col).border = THIN_BORDER;
-    }
-    emptyRow.height = 24;
-    return;
-  }
-
-  findings.forEach((finding, index) => {
-    const row = ws.getRow(index + 2);
-    const values: readonly (string | number)[] = [
-      finding.findingNumber,
-      finding.clauseTitle,
-      finding.findingType,
-      finding.ncStatus,
-      finding.remarks,
+    const row = ws.getRow(rowNumber);
+    const values = [
+      clause.title,
+      clause.description,
+      statusText,
+      outcomeText,
+      remarksText,
     ];
     const isAlt = index % 2 === 1;
 
     values.forEach((val, colIdx) => {
       const cell = row.getCell(colIdx + 1);
       cell.value = val;
-      cell.font =
-        colIdx === 2
-          ? {
-              ...BASE_FONT,
-              bold: true,
-              color: {
-                argb:
-                  finding.findingType === 'Major NC'
-                    ? 'FFB91C1C'
-                    : finding.findingType === 'Minor NC'
-                      ? 'FFB45309'
-                      : 'FF1D4ED8',
-              },
-            }
-          : BASE_FONT;
+      if (colIdx === 0) {
+        cell.font = { ...BASE_FONT, bold: true };
+      } else if (colIdx === 2) {
+        cell.font = {
+          ...BASE_FONT,
+          bold: true,
+          color: { argb: getStatusFontColor(evaluation.status) },
+        };
+      } else {
+        cell.font = BASE_FONT;
+      }
       cell.alignment = {
         vertical: 'top',
-        horizontal: colIdx === 0 ? 'center' : 'left',
+        horizontal: colIdx === 2 ? 'center' : 'left',
         wrapText: true,
       };
       cell.border = THIN_BORDER;
@@ -562,8 +544,126 @@ function buildListOfFindingsSheet(
 
     row.height = estimateRowHeight(
       [
-        { text: finding.clauseTitle, widthChars: 38 },
-        { text: finding.remarks, widthChars: 64 },
+        { text: clause.title, widthChars: 30 },
+        { text: clause.description, widthChars: 42 },
+        { text: statusText, widthChars: 15 },
+        { text: outcomeText, widthChars: 58 },
+        { text: remarksText, widthChars: 34 },
+      ],
+      15,
+      30,
+    );
+  });
+}
+
+function buildListOfFindingsSheet(
+  workbook: ExcelJS.Workbook,
+  findings: readonly FindingRecord[],
+  clauseLocations: ReadonlyMap<string, ClauseRowLocation>,
+): void {
+  const ws = workbook.addWorksheet('List of Findings');
+  configurePrintLayout(ws, true);
+
+  ws.columns = [
+    { key: 'num', width: 12 },
+    { key: 'clause', width: 40 },
+    { key: 'type', width: 16 },
+    { key: 'remarks', width: 68 },
+  ];
+
+  const headerRow = ws.getRow(1);
+  const headers = [
+    'Finding #',
+    'Clause',
+    'Finding Type',
+    'Auditor Remarks',
+  ];
+  headers.forEach((title, idx) => {
+    const cell = headerRow.getCell(idx + 1);
+    cell.value = title;
+    cell.font = HEADER_FONT;
+    cell.fill = HEADER_FILL;
+    cell.alignment = {
+      vertical: 'middle',
+      horizontal: idx === 0 || idx === 2 ? 'center' : 'left',
+      wrapText: true,
+    };
+    cell.border = THIN_BORDER;
+  });
+  headerRow.height = 26;
+  ws.views = [{ state: 'frozen', ySplit: 1 }];
+
+  if (findings.length === 0) {
+    ws.mergeCells(2, 1, 2, 4);
+    const emptyRow = ws.getRow(2);
+    const cell = emptyRow.getCell(1);
+    cell.value = 'No nonconformities or observations were recorded during this audit.';
+    cell.font = { ...BASE_FONT, italic: true, color: { argb: 'FF475569' } };
+    cell.alignment = { vertical: 'middle', horizontal: 'left' };
+    for (let col = 1; col <= 4; col += 1) {
+      emptyRow.getCell(col).border = THIN_BORDER;
+    }
+    emptyRow.height = 24;
+    return;
+  }
+
+  ws.autoFilter = 'A1:D1';
+
+  findings.forEach((finding, index) => {
+    const row = ws.getRow(index + 2);
+    const location = clauseLocations.get(finding.clauseId);
+    const sheetRef = location ? escapeExcelSheetName(location.sheetName) : null;
+    const refRow = location?.rowNumber;
+    const isAlt = index % 2 === 1;
+
+    const numCell = row.getCell(1);
+    numCell.value = finding.findingNumber;
+
+    const clauseCell = row.getCell(2);
+    clauseCell.value =
+      sheetRef && refRow
+        ? { formula: `${sheetRef}!A${refRow}`, result: finding.clauseTitle }
+        : finding.clauseTitle;
+
+    const typeCell = row.getCell(3);
+    typeCell.value =
+      sheetRef && refRow
+        ? { formula: `${sheetRef}!C${refRow}`, result: finding.findingType }
+        : finding.findingType;
+
+    const remarksCell = row.getCell(4);
+    remarksCell.value =
+      sheetRef && refRow
+        ? {
+            formula: `IF(${sheetRef}!E${refRow}="","",${sheetRef}!E${refRow})`,
+            result: finding.remarks,
+          }
+        : finding.remarks;
+
+    [numCell, clauseCell, typeCell, remarksCell].forEach((cell, colIdx) => {
+      cell.font =
+        colIdx === 2
+          ? {
+              ...BASE_FONT,
+              bold: true,
+              color: { argb: getStatusFontColor(finding.findingType) },
+            }
+          : BASE_FONT;
+      cell.alignment = {
+        vertical: 'top',
+        horizontal: colIdx === 0 || colIdx === 2 ? 'center' : 'left',
+        wrapText: true,
+      };
+      cell.border = THIN_BORDER;
+      if (isAlt) {
+        cell.fill = ALT_ROW_FILL;
+      }
+    });
+
+    row.height = estimateRowHeight(
+      [
+        { text: finding.clauseTitle, widthChars: 40 },
+        { text: finding.remarks, widthChars: 68 },
       ],
       15,
       26,
@@ -592,17 +692,37 @@ export async function exportAuditReportToExcel(
     report.evaluations,
   );
 
+  const clauseSheetRanges: SheetRowRange[] = sheets.map((sheet) => {
+    const visibleCount = getVisibleClausesForSheet(
+      sheet,
+      report.details.schemes,
+      report.evaluations,
+    ).length;
+    return {
+      sheetName: sheet.sheetName,
+      lastRow: Math.max(visibleCount + 1, 2),
+    };
+  });
+
+  const clauseLocations = new Map<string, ClauseRowLocation>();
+
   // Preserve the exact 7-sheet order from Audit Report Format-CU SLAB - Rev;01 1.xlsx
   // plus the 8th auto-generated List of Findings sheet.
   buildAuditDetailsSheet(workbook, report, config);
   buildIntroductionSheet(workbook, report, config);
-  buildFindingsAndConclusionSheet(workbook, report, config, summary, findings.length);
+  buildFindingsAndConclusionSheet(
+    workbook,
+    report,
+    config,
+    summary,
+    clauseSheetRanges,
+  );
 
   for (const sheet of sheets) {
-    buildClauseSheet(workbook, sheet, report);
+    buildClauseSheet(workbook, sheet, report, clauseLocations);
   }
 
-  buildListOfFindingsSheet(workbook, findings);
+  buildListOfFindingsSheet(workbook, findings, clauseLocations);
 
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], {
