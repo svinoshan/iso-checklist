@@ -1,22 +1,26 @@
+import { useEffect, useRef, useState } from 'react';
 import {
+  ChevronDown,
   Download,
   FileSpreadsheet,
+  FileText,
   FolderOpen,
   Loader2,
   Plus,
 } from 'lucide-react';
-import type { FindingsSummary, IsoScheme } from '../types/audit';
+import type { ExportFormat, FindingsSummary, IsoScheme } from '../types/audit';
 
 interface HeaderBarProps {
   version: string;
   companyName: string;
   schemes: readonly IsoScheme[];
   summary: FindingsSummary;
-  isExporting: boolean;
+  exportingFormat: ExportFormat | null;
   lastSavedAt: string | null;
   onOpenDrafts: () => void;
   onNewAudit: () => void;
   onExportExcel: () => void;
+  onExportPdf: () => void;
 }
 
 const SCHEME_ORDER: readonly IsoScheme[] = ['9001', '14001', '45001'];
@@ -38,16 +42,59 @@ export function HeaderBar({
   companyName,
   schemes,
   summary,
-  isExporting,
+  exportingFormat,
   lastSavedAt,
   onOpenDrafts,
   onNewAudit,
   onExportExcel,
+  onExportPdf,
 }: HeaderBarProps) {
+  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
+  const exportMenuRef = useRef<HTMLDivElement | null>(null);
+
+  const isExporting = exportingFormat !== null;
   const orderedSchemes = SCHEME_ORDER.filter((scheme) =>
     schemes.includes(scheme),
   );
   const displayCompany = companyName.trim() || 'Control Union';
+
+  useEffect(() => {
+    if (!isExportMenuOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsExportMenuOpen(false);
+      }
+    };
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        exportMenuRef.current &&
+        event.target instanceof Node &&
+        !exportMenuRef.current.contains(event.target)
+      ) {
+        setIsExportMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isExportMenuOpen]);
+
+  const handleSelectExport = (format: ExportFormat) => {
+    setIsExportMenuOpen(false);
+    if (format === 'excel') {
+      onExportExcel();
+    } else {
+      onExportPdf();
+    }
+  };
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
@@ -154,20 +201,74 @@ export function HeaderBar({
             <span>New Audit</span>
           </button>
 
-          <button
-            type="button"
-            onClick={onExportExcel}
-            disabled={isExporting}
-            aria-busy={isExporting}
-            className="inline-flex items-center gap-1.5 rounded-md bg-[#1E3A5F] px-3 py-1.5 text-xs font-semibold text-white shadow-xs transition hover:bg-[#162d4a] disabled:opacity-60"
-          >
-            {isExporting ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <Download className="h-3.5 w-3.5" />
+          {/* Unified Export Dropdown */}
+          <div ref={exportMenuRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setIsExportMenuOpen((prev) => !prev)}
+              disabled={isExporting}
+              aria-busy={isExporting}
+              aria-haspopup="menu"
+              aria-expanded={isExportMenuOpen}
+              className="inline-flex items-center gap-1.5 rounded-md bg-[#1E3A5F] px-3 py-1.5 text-xs font-semibold text-white shadow-xs transition hover:bg-[#162d4a] disabled:opacity-60"
+            >
+              {isExporting ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Download className="h-3.5 w-3.5" />
+              )}
+              <span>
+                {exportingFormat === 'excel'
+                  ? 'Exporting Excel...'
+                  : exportingFormat === 'pdf'
+                    ? 'Exporting PDF...'
+                    : 'Export'}
+              </span>
+              {!isExporting && <ChevronDown className="h-3.5 w-3.5 opacity-80" />}
+            </button>
+
+            {isExportMenuOpen && !isExporting && (
+              <div
+                role="menu"
+                aria-label="Export report format"
+                className="absolute right-0 mt-1.5 w-64 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg"
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => handleSelectExport('excel')}
+                  className="flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition hover:bg-slate-50"
+                >
+                  <FileSpreadsheet className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" />
+                  <div>
+                    <div className="text-xs font-semibold text-slate-900">
+                      Export Excel (.xlsx)
+                    </div>
+                    <div className="text-[0.6875rem] text-slate-500">
+                      Editable workbook with live formulas
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => handleSelectExport('pdf')}
+                  className="flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition hover:bg-slate-50"
+                >
+                  <FileText className="mt-0.5 h-4 w-4 shrink-0 text-[#0090D0]" />
+                  <div>
+                    <div className="text-xs font-semibold text-slate-900">
+                      Export PDF Report (.pdf)
+                    </div>
+                    <div className="text-[0.6875rem] text-slate-500">
+                      Client-ready report with cover page
+                    </div>
+                  </div>
+                </button>
+              </div>
             )}
-            <span>{isExporting ? 'Generating...' : 'Export Excel'}</span>
-          </button>
+          </div>
         </div>
       </div>
     </header>

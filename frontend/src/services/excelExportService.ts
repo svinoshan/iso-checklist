@@ -208,7 +208,8 @@ function buildIntroductionSheet(
   ws.columns = [{ key: 'content', width: 120 }];
 
   const entityMatch = config.accreditedEntities.find(
-    (item) => item.code === report.introduction.accreditedLegalEntity,
+    (item) =>
+      item.code === report.introduction.accreditedLegalEntity && !item.disabled,
   );
   const accreditationBodyDisplay = entityMatch ? entityMatch.fullName : '';
   const legalEntityDisplay = entityMatch

@@ -29,10 +29,13 @@ export type WizardStepId =
   | ClauseSheetId
   | 'findings-conclusion';
 
+export type ExportFormat = 'excel' | 'pdf';
+
 export interface SchemeOption {
   code: IsoScheme;
   shortLabel: string;
   standardCode: string;
+  standardVersion: string;
   fullName: string;
 }
 
