@@ -86,6 +86,16 @@
       "outcomeB": "Actions to address significant environmental aspects, compliance obligations, environmental risks and opportunities have been established and implemented; except for the findings listed in the List of Findings. The following records were assessed as the basis for the conclusion:"
     },
     {
+      "id": "6.1.4-45001",
+      "title": "6.1.4 Planning actions (ISO 45001)",
+      "description": "Effectiveness of processes for planning and implementing actions to address OH&S risks, opportunities, legal and other requirements, and identified issues to achieve intended OH&S outcomes and continual improvement.",
+      "applicableSchemes": [
+        "45001"
+      ],
+      "outcomeA": "Actions to address OH&S risks, opportunities, legal and other requirements were effectively planned and implemented through OH&S management system processes. No nonconformities were identified. The conclusion is based on interviews and verification of relevant activities and records.",
+      "outcomeB": "Actions to address OH&S risks, opportunities, legal and other requirements were planned and implemented; however, their effectiveness could not be fully demonstrated. Refer to the List of Findings. The following records were assessed as the basis for the conclusion."
+    },
+    {
       "id": "6.1.5-14001",
       "title": "6.1.5 Planning actions (ISO 14001)",
       "description": "Adequacy of monitoring and evaluation arrangements to determine the effectiveness of actions taken to address environmental aspects, compliance obligations, risks and opportunities and achieve intended EMS outcomes.",
