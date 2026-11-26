@@ -127,7 +127,7 @@ export function AuditDetailsStep({
             onChange={(e) =>
               onChange({ ...details, cuProjectNumber: e.target.value })
             }
-            placeholder="e.g., CU-PRJ-2026-001"
+            placeholder="e.g., PRJ 123456"
             className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-900 focus:border-[#1E3A5F] focus:ring-2 focus:ring-[#1E3A5F]/20 focus:outline-none"
           />
         </div>
