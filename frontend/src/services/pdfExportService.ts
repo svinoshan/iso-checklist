@@ -1095,6 +1095,7 @@ function drawClauseEvaluationSections(
 function drawRunningHeadersAndFooters(
   doc: jsPDF,
   report: AuditReport,
+  config: AuditConfig,
   logo: LoadedImageAsset | null,
 ): void {
   const totalPages = doc.getNumberOfPages();
@@ -1120,18 +1121,30 @@ function drawRunningHeadersAndFooters(
     doc.setLineWidth(0.25);
     doc.line(MARGIN_X, 16, PAGE_W - MARGIN_X, 16);
 
-    // Running Footer
+    // Running Footer (2-line format with JSON-driven document version)
     doc.setDrawColor(...BORDER_LIGHT);
     doc.setLineWidth(0.25);
-    doc.line(MARGIN_X, PAGE_H - 13, PAGE_W - MARGIN_X, PAGE_H - 13);
+    doc.line(MARGIN_X, PAGE_H - 14.5, PAGE_W - MARGIN_X, PAGE_H - 14.5);
 
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.5);
+    doc.setFontSize(7.2);
     doc.setTextColor(...CU_SLATE);
-    doc.text('Confidential | Control Union Certification Audit Report', MARGIN_X, PAGE_H - 8.5);
+    doc.text(
+      'Confidential | Control Union Certification Audit Report |',
+      MARGIN_X,
+      PAGE_H - 10.5,
+    );
+    if (config.documentControlNumber.trim()) {
+      doc.text(
+        config.documentControlNumber.trim(),
+        MARGIN_X,
+        PAGE_H - 6.8,
+      );
+    }
 
+    doc.setFontSize(7.5);
     doc.setTextColor(...TEXT_MUTED);
-    doc.text(`Page ${page} of ${totalPages}`, PAGE_W - MARGIN_X, PAGE_H - 8.5, {
+    doc.text(`Page ${page} of ${totalPages}`, PAGE_W - MARGIN_X, PAGE_H - 10.5, {
       align: 'right',
     });
   }
@@ -1175,7 +1188,7 @@ export async function exportAuditReportToPdf(
   drawIntroductionSection(doc, report, config);
   drawFindingsAndConclusionSection(doc, report, config, summary, findings);
   drawClauseEvaluationSections(doc, report, sheets);
-  drawRunningHeadersAndFooters(doc, report, logo);
+  drawRunningHeadersAndFooters(doc, report, config, logo);
 
   const companySlug = (report.details.companyName || 'Audit_Report')
     .trim()

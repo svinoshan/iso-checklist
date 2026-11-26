@@ -1,6 +1,7 @@
 {
   "appVersion": "v1.0.0",
   "templateRevision": "CU SLAB - Rev 01",
+  "documentControlNumber": "IMS.AS.F01 - Program Manual IMS - Version:SL01;26-11-2026",
   "auditTypes": [
     "Initial Stage 01",
     "Initial Stage 02",

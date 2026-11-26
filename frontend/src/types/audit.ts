@@ -72,6 +72,7 @@ export interface AuditStaticContent {
 export interface AuditConfig {
   appVersion: string;
   templateRevision: string;
+  documentControlNumber: string;
   auditTypes: AuditType[];
   schemes: SchemeOption[];
   accreditedEntities: AccreditedEntityOption[];
