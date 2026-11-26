@@ -262,7 +262,7 @@ export function HeaderBar({
                       Export PDF Report (.pdf)
                     </div>
                     <div className="text-[0.6875rem] text-slate-500">
-                      Client-ready report with cover page
+                      Formatted report with cover page
                     </div>
                   </div>
                 </button>
