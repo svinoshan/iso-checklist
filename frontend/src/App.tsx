@@ -26,6 +26,7 @@ import type {
   AuditDraftSummary,
   AuditReport,
   ClauseEvaluation,
+  ExportFormat,
   WizardStepId,
 } from './types/audit';
 
@@ -45,7 +46,9 @@ export default function App() {
   const [activeStep, setActiveStep] = useState<WizardStepId>('audit-details');
   const [drafts, setDrafts] = useState<AuditDraftSummary[]>([]);
   const [isDraftsOpen, setIsDraftsOpen] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
+  const [exportingFormat, setExportingFormat] = useState<ExportFormat | null>(
+    null,
+  );
   const isExportingRef = useRef(false);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
@@ -189,7 +192,7 @@ export default function App() {
     }
     isExportingRef.current = true;
     setExportError(null);
-    setIsExporting(true);
+    setExportingFormat('excel');
     try {
       await exportAuditReportToExcel(report, AUDIT_CONFIG, CLAUSE_SHEETS);
     } catch (err) {
@@ -200,7 +203,31 @@ export default function App() {
       );
     } finally {
       isExportingRef.current = false;
-      setIsExporting(false);
+      setExportingFormat(null);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    if (isExportingRef.current) {
+      return;
+    }
+    isExportingRef.current = true;
+    setExportError(null);
+    setExportingFormat('pdf');
+    try {
+      const { exportAuditReportToPdf } = await import(
+        './services/pdfExportService'
+      );
+      await exportAuditReportToPdf(report, AUDIT_CONFIG, CLAUSE_SHEETS);
+    } catch (err) {
+      setExportError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to generate PDF report.',
+      );
+    } finally {
+      isExportingRef.current = false;
+      setExportingFormat(null);
     }
   };
 
@@ -216,11 +243,12 @@ export default function App() {
         companyName={report.details.companyName}
         schemes={report.details.schemes}
         summary={summary}
-        isExporting={isExporting}
+        exportingFormat={exportingFormat}
         lastSavedAt={lastSavedAt}
         onOpenDrafts={() => setIsDraftsOpen(true)}
         onNewAudit={handleNewAudit}
         onExportExcel={() => void handleExportExcel()}
+        onExportPdf={() => void handleExportPdf()}
       />
 
       <StepNavigation
@@ -274,12 +302,13 @@ export default function App() {
               summary={summary}
               findings={findings}
               validationIssues={validationIssues}
-              isExporting={isExporting}
+              exportingFormat={exportingFormat}
               onChange={(conclusion) =>
                 setReport((prev) => ({ ...prev, conclusion }))
               }
               onNavigateStep={handleSelectStep}
               onExportExcel={() => void handleExportExcel()}
+              onExportPdf={() => void handleExportPdf()}
             />
           )}
 

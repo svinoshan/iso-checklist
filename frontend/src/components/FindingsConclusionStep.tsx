@@ -1,7 +1,14 @@
-import { AlertTriangle, CheckCircle2, Download, Loader2 } from 'lucide-react';
+import {
+  AlertTriangle,
+  CheckCircle2,
+  FileSpreadsheet,
+  FileText,
+  Loader2,
+} from 'lucide-react';
 import type {
   AuditConclusionState,
   AuditConfig,
+  ExportFormat,
   FindingRecord,
   FindingsSummary,
   ValidationIssue,
@@ -14,10 +21,11 @@ interface FindingsConclusionStepProps {
   summary: FindingsSummary;
   findings: readonly FindingRecord[];
   validationIssues: readonly ValidationIssue[];
-  isExporting: boolean;
+  exportingFormat: ExportFormat | null;
   onChange: (updated: AuditConclusionState) => void;
   onNavigateStep: (stepId: WizardStepId) => void;
   onExportExcel: () => void;
+  onExportPdf: () => void;
 }
 
 export function FindingsConclusionStep({
@@ -26,11 +34,13 @@ export function FindingsConclusionStep({
   summary,
   findings,
   validationIssues,
-  isExporting,
+  exportingFormat,
   onChange,
   onNavigateStep,
   onExportExcel,
+  onExportPdf,
 }: FindingsConclusionStepProps) {
+  const isExporting = exportingFormat !== null;
   const toggleConclusion = (id: string) => {
     const exists = conclusion.selectedConclusions.includes(id);
     const nextSelected = exists
@@ -392,24 +402,45 @@ export function FindingsConclusionStep({
               </div>
             )}
 
-            <button
-              type="button"
-              onClick={onExportExcel}
-              disabled={isExporting}
-              aria-busy={isExporting}
-              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#1E3A5F] px-4 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-[#162d4a] disabled:opacity-60 sm:text-sm"
-            >
-              {isExporting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Download className="h-4 w-4" />
-              )}
-              <span>
-                {isExporting
-                  ? 'Generating Excel Report...'
-                  : 'Generate Completed Excel Report (.xlsx)'}
-              </span>
-            </button>
+            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={onExportExcel}
+                disabled={isExporting}
+                aria-busy={exportingFormat === 'excel'}
+                className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#1E3A5F] px-3.5 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-[#162d4a] disabled:opacity-60"
+              >
+                {exportingFormat === 'excel' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <FileSpreadsheet className="h-4 w-4" />
+                )}
+                <span>
+                  {exportingFormat === 'excel'
+                    ? 'Generating Excel...'
+                    : 'Export Excel (.xlsx)'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={onExportPdf}
+                disabled={isExporting}
+                aria-busy={exportingFormat === 'pdf'}
+                className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#0090D0] px-3.5 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-[#007bb3] disabled:opacity-60"
+              >
+                {exportingFormat === 'pdf' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <FileText className="h-4 w-4" />
+                )}
+                <span>
+                  {exportingFormat === 'pdf'
+                    ? 'Generating PDF...'
+                    : 'Export PDF (.pdf)'}
+                </span>
+              </button>
+            </div>
           </section>
         </div>
       </div>

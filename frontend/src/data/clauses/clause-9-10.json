@@ -37,6 +37,16 @@
       "outcomeB": "Compliance evaluation arrangements have been established and implemented; except for the findings listed in the List of Findings."
     },
     {
+      "id": "9.1.3-9001",
+      "title": "9.1.3 Analysis and evaluation (ISO 9001)",
+      "description": "Effectiveness of monitoring, measurement, analysis and evaluation processes for assessing management system performance, achievement of objectives, customer satisfaction, process performance, product conformity, risks and opportunities, and effectiveness of actions taken.",
+      "applicableSchemes": [
+        "9001"
+      ],
+      "outcomeA": "Monitoring, measurement, analysis and evaluation activities were effectively implemented to assess QMS performance and effectiveness. Results supported decision-making and continual improvement, and no nonconformities were identified. The conclusion is based on interviews and verification of relevant activities and records.",
+      "outcomeB": "Monitoring, measurement, analysis and evaluation processes were established and implemented; however, effective evaluation of QMS performance, objectives, customer satisfaction, process effectiveness, product conformity, and actions taken was not fully demonstrated. Refer to the List of Findings."
+    },
+    {
       "id": "9.2",
       "title": "9.2 Internal Audit",
       "description": "Effectiveness of internal audit programmes in evaluating management system conformity, implementation and effectiveness.",

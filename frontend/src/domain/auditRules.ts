@@ -268,7 +268,7 @@ export function validateAuditReportForExport(
   if (!report.introduction.accreditedLegalEntity) {
     issues.push({
       stepId: 'audit-introduction',
-      message: 'Accredited Legal Entity (SLAB / SWEDAC) is not selected.',
+      message: 'Accreditation Body is not selected.',
     });
   }
 
