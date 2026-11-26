@@ -515,10 +515,10 @@ function drawCoverPage(
   });
 
   const totalMetaRowsHeight = measuredRows.reduce((sum, r) => sum + r.rowH, 0);
-  const footerClearance = footerImage ? 14 : 20;
+  const footerClearance = footerImage ? 8 : 16;
   const bandTopY = Math.max(
     y + 18,
-    PAGE_H - footerH - footerClearance - totalMetaRowsHeight - 6,
+    PAGE_H - footerH - footerClearance - totalMetaRowsHeight - 2,
   );
 
   doc.setDrawColor(...BORDER_LIGHT);
