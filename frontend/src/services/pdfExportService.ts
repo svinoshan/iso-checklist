@@ -181,12 +181,7 @@ function lerpRgb(a: RgbColor, b: RgbColor, t: number): RgbColor {
   ];
 }
 
-function isCyanEmblemPixel(
-  r: number,
-  g: number,
-  b: number,
-  a: number,
-): boolean {
+function isCyanEmblemPixel(r: number, b: number, a: number): boolean {
   // Isolate Control Union's vivid cyan globe pixels while excluding white background
   // and neutral slate-grey CONTROLUNION wordmark (#5E7478 where b - r <= 30)
   return a > 80 && b - r >= 45 && b > 105;
@@ -232,11 +227,10 @@ async function sampleEmblemMaskFromAsset(
       for (let x = 0; x < maxScanX; x += 1) {
         const idx = (y * width + x) * 4;
         const r = data[idx] ?? 255;
-        const g = data[idx + 1] ?? 255;
         const b = data[idx + 2] ?? 255;
         const a = data[idx + 3] ?? 0;
 
-        if (isCyanEmblemPixel(r, g, b, a)) {
+        if (isCyanEmblemPixel(r, b, a)) {
           if (x < minX) minX = x;
           if (y < minY) minY = y;
           if (x > maxX) maxX = x;
@@ -321,7 +315,7 @@ function drawControlUnionDottedEmblem(
             const b = mask.data[idx + 2] ?? 255;
             const a = mask.data[idx + 3] ?? 0;
 
-            if (isCyanEmblemPixel(r, g, b, a)) {
+            if (isCyanEmblemPixel(r, b, a)) {
               hits += 1;
               rSum += r;
               gSum += g;
