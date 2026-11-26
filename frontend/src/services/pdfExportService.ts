@@ -44,9 +44,20 @@ const CONTENT_W = PAGE_W - MARGIN_X * 2;
 const TOP_CONTENT_Y = 24;
 const BOTTOM_LIMIT_Y = 278;
 
-interface LoadedLogoAsset {
+interface LoadedImageAsset {
   dataUrl: string;
   aspectRatio: number;
+}
+
+interface SampledEmblemMask {
+  width: number;
+  height: number;
+  aspectRatio: number;
+  data: Uint8ClampedArray;
+  minX: number;
+  minY: number;
+  boxW: number;
+  boxH: number;
 }
 
 interface JsPDFWithAutoTable extends jsPDF {
@@ -77,9 +88,12 @@ function getStatusRgb(status: ClauseStatus | null): RgbColor {
   }
 }
 
-async function loadLogoAsset(): Promise<LoadedLogoAsset | null> {
+async function loadImageAsset(
+  url: string,
+  fallbackAspectRatio: number,
+): Promise<LoadedImageAsset | null> {
   try {
-    const response = await fetch('/control-union-logo.png');
+    const response = await fetch(url);
     if (!response.ok) {
       return null;
     }
@@ -94,19 +108,23 @@ async function loadLogoAsset(): Promise<LoadedLogoAsset | null> {
         if (typeof reader.result === 'string') {
           resolve(reader.result);
         } else {
-          reject(new Error('Invalid logo data URL'));
+          reject(new Error(`Invalid image data URL for ${url}`));
         }
       };
-      reader.onerror = () => reject(new Error('Failed to read logo blob'));
+      reader.onerror = () => reject(new Error(`Failed to read image blob for ${url}`));
       reader.readAsDataURL(blob);
     });
 
     const aspectRatio = await new Promise<number>((resolve) => {
       const img = new Image();
       img.onload = () => {
-        resolve(img.naturalHeight > 0 ? img.naturalWidth / img.naturalHeight : 3.9);
+        resolve(
+          img.naturalHeight > 0
+            ? img.naturalWidth / img.naturalHeight
+            : fallbackAspectRatio,
+        );
       };
-      img.onerror = () => resolve(3.9);
+      img.onerror = () => resolve(fallbackAspectRatio);
       img.src = dataUrl;
     });
 
@@ -118,7 +136,7 @@ async function loadLogoAsset(): Promise<LoadedLogoAsset | null> {
 
 function drawControlUnionLogo(
   doc: jsPDF,
-  logo: LoadedLogoAsset | null,
+  logo: LoadedImageAsset | null,
   x: number,
   y: number,
   heightMm: number,
@@ -154,46 +172,213 @@ function drawControlUnionLogo(
   doc.text('UNION', textX + controlWidth + 0.5, textY);
 }
 
-function drawCoverWavePattern(doc: jsPDF, panelX: number, panelW: number, panelH: number): void {
-  // Subtle geometric dotted twin-wave motif inside the right-hand cover accent panel
-  const steps = 46;
-  const bands = 6;
+function lerpRgb(a: RgbColor, b: RgbColor, t: number): RgbColor {
+  const clamped = Math.max(0, Math.min(1, t));
+  return [
+    Math.round(a[0] + (b[0] - a[0]) * clamped),
+    Math.round(a[1] + (b[1] - a[1]) * clamped),
+    Math.round(a[2] + (b[2] - a[2]) * clamped),
+  ];
+}
 
-  // Upper sweeping wave (echoing Control Union's upper ribbon)
-  for (let b = 0; b < bands; b += 1) {
-    const bandOffset = b * 3.1;
-    const isAccent = b === 1 || b === 2;
-    doc.setFillColor(...(isAccent ? CU_BLUE : CU_WAVE_SOFT));
+function isCyanEmblemPixel(r: number, b: number, a: number): boolean {
+  // Isolate Control Union's vivid cyan globe pixels while excluding white background
+  // and neutral slate-grey CONTROLUNION wordmark (#5E7478 where b - r <= 30)
+  return a > 80 && b - r >= 45 && b > 105;
+}
 
-    for (let i = 0; i <= steps; i += 1) {
-      const t = i / steps;
-      const px = panelX + 2 + t * (panelW - 4);
-      const wave =
-        Math.sin(t * Math.PI * 1.15 - 0.35) * -28 +
-        Math.cos(t * Math.PI * 0.8) * 8;
-      const py = 58 + wave + bandOffset + t * -14;
-      if (px > panelX + 1 && px < PAGE_W - 1 && py > 8 && py < panelH - 4) {
-        const radius = isAccent ? 0.45 : 0.34;
-        doc.circle(px, py, radius, 'F');
+async function sampleEmblemMaskFromAsset(
+  asset: LoadedImageAsset,
+  restrictToLeftFraction: number,
+): Promise<SampledEmblemMask | null> {
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error('Failed to decode emblem image'));
+      el.src = asset.dataUrl;
+    });
+
+    const width = img.naturalWidth;
+    const height = img.naturalHeight;
+    if (width === 0 || height === 0) {
+      return null;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      return null;
+    }
+
+    ctx.drawImage(img, 0, 0, width, height);
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const data = imageData.data;
+
+    const maxScanX = Math.floor(width * restrictToLeftFraction);
+    let minX = width;
+    let minY = height;
+    let maxX = -1;
+    let maxY = -1;
+
+    for (let y = 0; y < height; y += 1) {
+      for (let x = 0; x < maxScanX; x += 1) {
+        const idx = (y * width + x) * 4;
+        const r = data[idx] ?? 255;
+        const b = data[idx + 2] ?? 255;
+        const a = data[idx + 3] ?? 0;
+
+        if (isCyanEmblemPixel(r, b, a)) {
+          if (x < minX) minX = x;
+          if (y < minY) minY = y;
+          if (x > maxX) maxX = x;
+          if (y > maxY) maxY = y;
+        }
       }
     }
+
+    if (maxX <= minX || maxY <= minY) {
+      return null;
+    }
+
+    const boxW = maxX - minX + 1;
+    const boxH = maxY - minY + 1;
+
+    return {
+      width,
+      height,
+      aspectRatio: boxW / boxH,
+      data,
+      minX,
+      minY,
+      boxW,
+      boxH,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function drawControlUnionDottedEmblem(
+  doc: jsPDF,
+  mask: SampledEmblemMask | null,
+  rightEdgeX: number,
+  centerY: number,
+  targetW: number,
+): void {
+  if (mask) {
+    const targetH = targetW / mask.aspectRatio;
+    const startX = rightEdgeX - targetW;
+    const startY = centerY - targetH / 2;
+
+    const stepX = 2.4;
+    const stepY = 2.1;
+    let rowIdx = 0;
+
+    for (let py = startY; py <= startY + targetH; py += stepY) {
+      const xOffset = rowIdx % 2 === 1 ? stepX * 0.5 : 0;
+      rowIdx += 1;
+
+      for (let px = startX + xOffset; px <= startX + targetW; px += stepX) {
+        const u = (px - startX) / targetW;
+        const v = (py - startY) / targetH;
+        if (u < 0 || u > 1 || v < 0 || v > 1) {
+          continue;
+        }
+
+        const sampleCx = mask.minX + u * (mask.boxW - 1);
+        const sampleCy = mask.minY + v * (mask.boxH - 1);
+
+        // 3x3 neighborhood sample for smooth anti-aliased silhouette fidelity
+        let hits = 0;
+        let rSum = 0;
+        let gSum = 0;
+        let bSum = 0;
+        const sampleStepX = Math.max(1, Math.round(mask.boxW / 80));
+        const sampleStepY = Math.max(1, Math.round(mask.boxH / 80));
+
+        for (let oy = -1; oy <= 1; oy += 1) {
+          for (let ox = -1; ox <= 1; ox += 1) {
+            const sx = Math.max(
+              0,
+              Math.min(mask.width - 1, Math.round(sampleCx + ox * sampleStepX)),
+            );
+            const sy = Math.max(
+              0,
+              Math.min(mask.height - 1, Math.round(sampleCy + oy * sampleStepY)),
+            );
+            const idx = (sy * mask.width + sx) * 4;
+            const r = mask.data[idx] ?? 255;
+            const g = mask.data[idx + 1] ?? 255;
+            const b = mask.data[idx + 2] ?? 255;
+            const a = mask.data[idx + 3] ?? 0;
+
+            if (isCyanEmblemPixel(r, b, a)) {
+              hits += 1;
+              rSum += r;
+              gSum += g;
+              bSum += b;
+            }
+          }
+        }
+
+        const coverage = hits / 9;
+        if (coverage < 0.35) {
+          continue;
+        }
+
+        const avgColor: RgbColor = [
+          Math.round(rSum / hits),
+          Math.round(gSum / hits),
+          Math.round(bSum / hits),
+        ];
+
+        // Soften gently on the left side facing the title, blooming into vivid cyan on the right
+        const tintStrength = 0.42 + u * 0.48;
+        const dotColor = lerpRgb(WHITE, avgColor, tintStrength);
+        const dotRadius = 0.34 + coverage * 0.42;
+
+        doc.setFillColor(...dotColor);
+        doc.circle(px, py, dotRadius, 'F');
+      }
+    }
+    return;
   }
 
-  // Lower sweeping wave (echoing Control Union's lower ribbon)
-  for (let b = 0; b < bands - 1; b += 1) {
-    const bandOffset = b * 3.4;
-    const isAccent = b === 1;
-    doc.setFillColor(...(isAccent ? CU_BLUE : CU_WAVE_SOFT));
+  // Vector math fallback if no Control Union logo PNG is available in public/
+  const radius = targetW * 0.5;
+  const cx = rightEdgeX - radius;
+  const stepX = 2.6;
+  const stepY = 2.25;
+  let rowIdx = 0;
 
-    for (let i = 0; i <= steps; i += 1) {
-      const t = i / steps;
-      const px = panelX + panelW * 0.35 + t * (panelW * 0.65);
-      const curve = Math.pow(1 - t, 1.8) * 78;
-      const py = 122 + curve + bandOffset - t * 20;
-      if (px > panelX + 1 && px < PAGE_W - 1 && py > 18 && py < panelH - 4) {
-        const radius = isAccent ? 0.45 : 0.35;
-        doc.circle(px, py, radius, 'F');
+  for (let py = centerY - radius; py <= centerY + radius; py += stepY) {
+    const xOffset = rowIdx % 2 === 1 ? stepX * 0.5 : 0;
+    rowIdx += 1;
+
+    for (let px = cx - radius + xOffset; px <= cx + radius; px += stepX) {
+      const nx = (px - cx) / radius;
+      const ny = (py - centerY) / radius;
+      const dist = Math.hypot(nx, ny);
+      if (dist > 0.98) {
+        continue;
       }
+
+      const channelCenterY = -0.24 * nx - 0.14 * Math.sin(nx * Math.PI);
+      const channelHalfWidth = 0.21 - 0.04 * nx * nx;
+      if (Math.abs(ny - channelCenterY) < channelHalfWidth) {
+        continue;
+      }
+
+      const intensity = Math.max(0.2, Math.min(1, (nx + 0.85) / 1.7));
+      const dotColor =
+        intensity > 0.55
+          ? lerpRgb(CU_WAVE_SOFT, CU_BLUE, (intensity - 0.55) / 0.45)
+          : lerpRgb(CU_ICE, CU_WAVE_SOFT, intensity / 0.55);
+      doc.setFillColor(...dotColor);
+      doc.circle(px, py, 0.34 + intensity * 0.4, 'F');
     }
   }
 }
@@ -202,38 +387,46 @@ function drawCoverPage(
   doc: jsPDF,
   report: AuditReport,
   config: AuditConfig,
-  logo: LoadedLogoAsset | null,
+  logo: LoadedImageAsset | null,
+  emblemMask: SampledEmblemMask | null,
+  footerImage: LoadedImageAsset | null,
 ): void {
-  const panelX = 82;
-  const panelW = PAGE_W - panelX;
-  const panelH = 204;
-
-  // Right-hand Control Union soft ice-blue accent panel
-  doc.setFillColor(...CU_ICE);
-  doc.rect(panelX, 0, panelW, panelH, 'F');
-
-  // Subtle top cyan accent bar over the right panel
+  // Full-width Control Union cyan top accent strip
   doc.setFillColor(...CU_BLUE);
-  doc.rect(panelX, 0, panelW, 2.5, 'F');
-
-  // Dotted twin-wave geometric artwork
-  drawCoverWavePattern(doc, panelX, panelW, panelH);
+  doc.rect(0, 0, PAGE_W, 3, 'F');
 
   // Top-left official Control Union logo
-  drawControlUnionLogo(doc, logo, 18, 16, 11.5);
+  drawControlUnionLogo(doc, logo, 18, 13.5, 11.5);
 
-  // Top-right subtle brand URL (matching docs/image.png)
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.setTextColor(...CU_SLATE);
-  doc.text('WWW.CONTROLUNION.COM', PAGE_W - 14, 21, { align: 'right' });
+  // Top-right official Control Union tagline ("The proof to your promise")
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9.5);
+  const promiseText = 'promise';
+  const promiseWidth = doc.getTextWidth(promiseText);
+  const taglineRightX = PAGE_W - 14;
 
-  // Hero Title Block (spanning cleanly across the split like docs/image (5).png)
-  let y = 84;
+  doc.setTextColor(...CU_BLUE);
+  doc.text(promiseText, taglineRightX, 20.5, { align: 'right' });
+
+  doc.setTextColor(...CU_NAVY);
+  doc.text('The proof to your ', taglineRightX - promiseWidth, 20.5, {
+    align: 'right',
+  });
+
+  // Subtle top header hairline
+  doc.setDrawColor(...BORDER_LIGHT);
+  doc.setLineWidth(0.25);
+  doc.line(18, 30, PAGE_W - 14, 30);
+
+  // 1:1 Halftone Dotted Control Union Emblem in upper-right (aligned cleanly to right margin)
+  drawControlUnionDottedEmblem(doc, emblemMask, PAGE_W - 14, 96, 86);
+
+  // Hero Title Block (cleanly positioned on the left)
+  let y = 78;
 
   // Short Control Union cyan accent dash
   doc.setFillColor(...CU_BLUE);
-  doc.rect(18, y - 6, 16, 1.3, 'F');
+  doc.rect(18, y - 6, 18, 1.3, 'F');
 
   // Audit Type subtitle
   const auditTypeHeading = report.details.auditType
@@ -250,16 +443,16 @@ function drawCoverPage(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(23);
   doc.setTextColor(...CU_NAVY);
-  const companyLines = doc.splitTextToSize(companyTitle, 168) as string[];
+  const companyLines = doc.splitTextToSize(companyTitle, 112) as string[];
   doc.text(companyLines, 18, y);
-  y += companyLines.length * 9.5 + 3;
+  y += companyLines.length * 9.5 + 3.5;
 
   // Subtitle: Management System Certification
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.setTextColor(...CU_NAVY);
   doc.text('Management System Certification', 18, y);
-  y += 7;
+  y += 7.5;
 
   // Selected ISO Standards with Version Years (e.g. ISO 9001:2015)
   const orderedStandards = config.schemes
@@ -280,11 +473,14 @@ function drawCoverPage(
     doc.text('No ISO scheme selected', 18, y);
   }
 
-  // Bottom-Right Metadata Block (aligned cleanly below the accent panel)
-  const metaX = panelX + 4;
-  const metaValueX = metaX + 44;
+  // Compute footer height first so the Audit Details block can anchor cleanly above it
+  const footerH = footerImage
+    ? Math.min(PAGE_W / footerImage.aspectRatio, 42)
+    : 3.5;
+
+  const metaX = 94;
+  const metaValueX = metaX + 43;
   const metaValueMaxW = PAGE_W - 14 - metaValueX;
-  let metaY = panelH + 12;
 
   const dateRange =
     report.details.auditStartDate && report.details.auditEndDate
@@ -293,54 +489,65 @@ function drawCoverPage(
           report.details.auditStartDate || report.details.auditEndDate,
         ) || '-';
 
-  const entityMatch = config.accreditedEntities.find(
-    (item) =>
-      item.code === report.introduction.accreditedLegalEntity && !item.disabled,
-  );
-
   const metaRows: readonly [string, string][] = [
     ['Audit Start - End Date', dateRange],
     ['CU Project Number', report.details.cuProjectNumber.trim() || '-'],
     ['Team Leader', report.details.teamLeader.trim() || '-'],
     ['Audit Team', report.details.teamMembers.trim() || '-'],
-    ['Accreditation Body', entityMatch ? entityMatch.label : '-'],
     [
       'Report Completed Date',
       formatDisplayDate(report.details.reportCompletedDate) || '-',
     ],
   ];
 
+  doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
-  for (const [label, value] of metaRows) {
+  const measuredRows = metaRows.map(([label, value]) => {
+    const valLines = doc.splitTextToSize(value, metaValueMaxW) as string[];
+    const rowH = Math.max(1, valLines.length) * 4.5 + 3.5;
+    return { label, valLines, rowH };
+  });
+
+  const totalMetaRowsHeight = measuredRows.reduce((sum, r) => sum + r.rowH, 0);
+  const footerClearance = footerImage ? 8 : 16;
+  const bandTopY = Math.max(
+    y + 18,
+    PAGE_H - footerH - footerClearance - totalMetaRowsHeight - 2,
+  );
+
+  doc.setDrawColor(...BORDER_LIGHT);
+  doc.setLineWidth(0.25);
+  doc.line(metaX, bandTopY, PAGE_W - 14, bandTopY);
+
+  let metaY = bandTopY + 8.5;
+  doc.setFontSize(9);
+  for (const row of measuredRows) {
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...TEXT_MUTED);
-    doc.text(label, metaX, metaY);
+    doc.text(row.label, metaX, metaY);
 
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...CU_NAVY);
-    const valLines = doc.splitTextToSize(value, metaValueMaxW) as string[];
-    doc.text(valLines, metaValueX, metaY);
-    metaY += Math.max(1, valLines.length) * 4.5 + 3.2;
+    doc.text(row.valLines, metaValueX, metaY);
+    metaY += row.rowH;
   }
 
-  // Subtle Bottom-Left Legal Entity & Footer Accent Bar
-  if (entityMatch?.legalEntityName) {
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8.5);
-    doc.setTextColor(...CU_NAVY);
-    doc.text(entityMatch.legalEntityName, 18, PAGE_H - 22);
-
-    if (entityMatch.legalEntityAddress) {
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7.5);
-      doc.setTextColor(...TEXT_MUTED);
-      const addrLines = doc.splitTextToSize(entityMatch.legalEntityAddress, 60) as string[];
-      doc.text(addrLines, 18, PAGE_H - 18);
-    }
+  // Panoramic Control Union Horizon Footer Artwork (docs/image.png -> public/control-union-footer.png)
+  if (footerImage) {
+    const footerW = footerH * footerImage.aspectRatio;
+    const footerX = (PAGE_W - footerW) / 2;
+    doc.addImage(
+      footerImage.dataUrl,
+      'PNG',
+      footerX,
+      PAGE_H - footerH,
+      footerW,
+      footerH,
+    );
+  } else {
+    doc.setFillColor(...CU_BLUE);
+    doc.rect(0, PAGE_H - 3.5, PAGE_W, 3.5, 'F');
   }
-
-  doc.setFillColor(...CU_BLUE);
-  doc.rect(0, PAGE_H - 3.5, PAGE_W, 3.5, 'F');
 }
 
 function drawSectionBanner(doc: jsPDF, title: string, y: number): number {
@@ -888,7 +1095,7 @@ function drawClauseEvaluationSections(
 function drawRunningHeadersAndFooters(
   doc: jsPDF,
   report: AuditReport,
-  logo: LoadedLogoAsset | null,
+  logo: LoadedImageAsset | null,
 ): void {
   const totalPages = doc.getNumberOfPages();
   const headerRight = [
@@ -941,7 +1148,18 @@ export async function exportAuditReportToPdf(
     format: 'a4',
   });
 
-  const logo = await loadLogoAsset();
+  const [logo, markImage, footerImage] = await Promise.all([
+    loadImageAsset('/control-union-logo.png', 3.9),
+    loadImageAsset('/control-union-mark.png', 1.15),
+    loadImageAsset('/control-union-footer.png', 6.2),
+  ]);
+
+  const emblemMask = markImage
+    ? await sampleEmblemMaskFromAsset(markImage, 1)
+    : logo
+      ? await sampleEmblemMaskFromAsset(logo, 0.35)
+      : null;
+
   const summary = calculateFindingsSummary(
     sheets,
     report.details.schemes,
@@ -953,7 +1171,7 @@ export async function exportAuditReportToPdf(
     report.evaluations,
   );
 
-  drawCoverPage(doc, report, config, logo);
+  drawCoverPage(doc, report, config, logo, emblemMask, footerImage);
   drawIntroductionSection(doc, report, config);
   drawFindingsAndConclusionSection(doc, report, config, summary, findings);
   drawClauseEvaluationSections(doc, report, sheets);
